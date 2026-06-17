@@ -14,7 +14,7 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
+const storage = isServerless ? multer.memoryStorage() : multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, uploadDir)
     },
@@ -1108,7 +1108,7 @@ app.post(['/api/scan', '/scan'], upload.single('drawing'), async (req, res) => {
         try {
             if (mimeType === 'application/pdf') {
                 const { PDFDocument } = require('pdf-lib');
-                const rawPdfBytes = fs.readFileSync(req.file.path);
+                const rawPdfBytes = req.file.buffer || fs.readFileSync(req.file.path);
                 
                 try {
                     const originalPdf = await PDFDocument.load(rawPdfBytes);
@@ -1128,16 +1128,17 @@ app.post(['/api/scan', '/scan'], upload.single('drawing'), async (req, res) => {
             } else if (mimeType.includes('word') || req.file.originalname.endsWith('.docx') || req.file.originalname.endsWith('.doc')) {
                 const AdmZip = require('adm-zip');
                 const mammoth = require('mammoth');
+                const buffer = req.file.buffer || fs.readFileSync(req.file.path);
                 
                 try {
-                    const textResult = await mammoth.extractRawText({path: req.file.path});
+                    const textResult = await mammoth.extractRawText({buffer: buffer});
                     fileTextContent = textResult.value;
                 } catch (e) {
                     console.error("[File Processing] Mammoth failed to extract text:", e.message);
                 }
                 
                 try {
-                    const zip = new AdmZip(req.file.path);
+                    const zip = new AdmZip(buffer);
                     const zipEntries = zip.getEntries();
                     let largestImage = null;
                     let maxSize = 0;
@@ -1172,8 +1173,8 @@ app.post(['/api/scan', '/scan'], upload.single('drawing'), async (req, res) => {
                 } catch (e) {
                     console.error("[File Processing] Error extracting image from docx:", e.message);
                 }
-            } else {
-                const buffer = fs.readFileSync(req.file.path);
+            } else if (mimeType.startsWith('image/')) {
+                const buffer = req.file.buffer || fs.readFileSync(req.file.path);
                 const image = await Jimp.read(buffer);
 
                 // Resize to maximum 800px to reduce token count and use JPEG
@@ -1194,7 +1195,9 @@ app.post(['/api/scan', '/scan'], upload.single('drawing'), async (req, res) => {
             }
         } catch (fileErr) {
             console.error("[File Processing] Processing failed, using raw file if possible:", fileErr.message);
-            if (mimeType.includes('image')) {
+            if (req.file.buffer) {
+                imageAsBase64 = req.file.buffer.toString('base64');
+            } else if (fs.existsSync(req.file.path)) {
                 imageAsBase64 = fs.readFileSync(req.file.path, 'base64');
             }
         }
