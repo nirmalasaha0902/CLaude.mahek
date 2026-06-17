@@ -1,0 +1,19 @@
+{
+  "name": "drawing-quotation-scanner-workspace",
+  "version": "1.0.0",
+  "description": "Monorepo workspace for Mahekk Industry Drawing Scanner",
+  "scripts": {
+    "start": "npm start --prefix backend",
+    "install:backend": "npm install --prefix backend",
+    "start:backend": "npm start --prefix backend",
+    "dev:backend": "npm start --prefix backend",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}

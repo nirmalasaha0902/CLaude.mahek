@@ -1,0 +1,36 @@
+Here is a detailed analysis of the engineering drawing:
+
+---
+
+### Engineering Drawing Analysis
+
+**1. Title Block Information:**
+
+*   **Part Name (DESCRIPTION):** SPACER
+*   **Drawing Number (DRG. NO.):** P25121070704
+*   **Material (MATERIAL.):** M.S. (likely Mild Steel)
+*   **Unit Description:** LOCATION UNIT
+*   **Unit Code:** PA2512107U07
+*   **Drawing Type:** PART
+*   **Date:** 14.04.2026 (Day and Month are 14.04, Year 2026 is visible above "BRM")
+*   **Revision:** 00
+*   **Sheet No.:** 1 OF 1
+
+**2. Overall Dimensions:**
+
+*   **Length/Width (Outer Diameter):** Ø25 mm
+*   **Thickness/Stock Size:** 4 mm
+    *(Note: For a circular part, Length and Width are defined by its overall diameter.)*
+
+**3. Holes:**
+
+*   **Inner Diameter:** Ø13 mm
+*   **Quantity of Holes:** 1 (central thru-hole)
+
+**4. Slots:**
+
+*   There are **no slots** present on this part.
+
+**5. Exact Shape:**
+
+*   The part is **circular/round** (specifically, it is a ring or washer-shaped component).

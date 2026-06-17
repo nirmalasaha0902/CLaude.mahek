@@ -1,0 +1,31 @@
+Here's a detailed analysis of the engineering drawing:
+
+---
+
+### Engineering Drawing Analysis
+
+**1. Title Block Information:**
+*   **Part Name:** WASHER -01
+*   **Drawing Number:** P25119090714
+*   **Material:** MS (Most likely Mild Steel)
+*   **Company:** PARC ROBOTIC SYS PVT LTD
+*   **Units:** All dimensions are in mm.
+*   **Drawing Dates:** 07-05-2020 (Drawn, Checked, Approved)
+*   **Drafter:** SANKALP
+*   **Checker/Approver:** NISHKANT
+
+**2. Overall Dimensions:**
+*   **Length/Width (Outer Diameter):** Ø41 mm (Diameter of 41 millimeters)
+*   **Thickness/Stock Size:** 5 ±0.05 mm (5 millimeters with a tolerance of plus or minus 0.05 mm)
+
+**3. Holes:**
+*   **Quantity:** 1 (one central hole)
+*   **Inner Diameter:** Ø17 mm (Diameter of 17 millimeters)
+
+**4. Slots:**
+*   There are **no slots** present on this part.
+
+**5. Exact Shape:**
+*   The part is **circular/round (annular)**. It is a flat, circular disk with a concentric circular hole, which is the definition of a washer.
+
+---

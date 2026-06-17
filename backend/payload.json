@@ -1,0 +1,1 @@
+{ "model": "minimax-m3-free", "messages": [ { "role": "user", "content": [ {"type": "text", "text": "Extract dimensions L and W from this image. Return JSON."}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="}} ] } ] }

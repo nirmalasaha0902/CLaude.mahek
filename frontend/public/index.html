@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing Quotation Scanner | Mahekk Industries</title>
+    <meta name="description" content="Engineering drawing quotation automation for Mahekk Industries, Precision Shim Manufacturer Pimpri Pune">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <span>M</span>
+                </div>
+                <div class="logo-text">
+                    <h1>MAHEKK</h1>
+                    <p>Industries</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+        <div class="hero-overlay"></div>
+        <div class="hero-pattern"></div>
+        <div class="hero-content">
+            <p class="hero-tag">AI-POWERED PRECISION</p>
+            <h2 class="hero-title">DRAWING QUOTATION<br>SCANNER</h2>
+            <p class="hero-subtitle">Precision Shim Manufacturer</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Session Start Card -->
+            <section id="sessionStartCard" class="card">
+                <div class="card-header-strip"></div>
+                <div class="card-title-row">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <h2>New Quotation Session</h2>
+                </div>
+                <form id="sessionForm">
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label for="companyNameInput">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                            Company / Client Name
+                        </label>
+                        <input type="text" id="companyNameInput" placeholder="Enter company name (e.g., Boeing, TATA, VENTEK)..." required>
+                    </div>
+                    <button type="submit" id="startSessionBtn" class="btn-primary">
+                        Start Quotation Session
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Main Scanner Workspace (hidden initially) -->
+            <div id="mainScannerContainer" class="hidden">
+                <!-- Session Header Banner -->
+                <div id="sessionHeader" class="session-header-banner">
+                    <div class="session-info">
+                        <span class="session-badge">Active Session</span>
+                        <h3>Quotation for: <span id="sessionCompanyNameText" class="company-name-highlight">Company Name</span></h3>
+                    </div>
+                    <button id="endSessionBtn" class="btn-end-session" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        New Session
+                    </button>
+                </div>
+
+                <!-- Compiled Drawings Card (shown when drawings exist in session) -->
+                <section id="sessionDrawingsCard" class="card hidden">
+                    <div class="card-header-strip"></div>
+                    <div class="card-title-row">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M12 11v6"/><path d="M9 14h6"/></svg>
+                        <h2>Compiled Sheets (<span id="drawingsCountText">0</span>)</h2>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table session-drawings-table">
+                            <thead>
+                                <tr>
+                                    <th>Sheet Tab</th>
+                                    <th>Part Name / Drawing No</th>
+                                    <th>Shape</th>
+                                    <th>Qty</th>
+                                    <th>Unit Cost</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sessionDrawingsList">
+                                <!-- Dynamically populated rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="session-totals-row">
+                        <span class="session-total-lbl">Total Session Value:</span>
+                        <span id="sessionTotalAmountText" class="session-total-val">₹0</span>
+                    </div>
+
+                    <div class="session-actions">
+                        <button id="downloadMultiExcelBtn" class="btn-download btn-download-all btn-primary" type="button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download All-in-One Excel File
+                        </button>
+                        <button id="downloadMultiPdfBtn" class="btn-download btn-download-all btn-danger" type="button" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); margin-left: 10px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download All-in-One PDF File
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Upload Section -->
+                <section class="upload-section card" id="uploadCard">
+                    <div class="card-header-strip"></div>
+                    <form id="uploadForm">
+                        <div class="file-upload-wrapper" id="dropZone" style="padding-bottom: 20px;">
+                            <input type="file" id="drawingInput" name="drawing" style="display: none;">
+                            <div class="upload-icon" id="uploadIcon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <p id="uploadText">Choose an option below</p>
+                            <p class="small-text" id="uploadSubText">Supported formats: JPG, PNG, PDF, Word</p>
+                            <img id="imagePreview" src="" alt="Drawing Preview" style="display: none;">
+                            <p id="filePreviewName" style="display: none; font-weight: bold; margin-top: 10px; text-align: center; color: #4338ca; background: #e0e7ff; padding: 10px; border-radius: 8px;"></p>
+                            
+                            <button type="button" class="btn-secondary" id="btnChangePhoto" style="display: none; margin-top: 15px; width: 100%; align-items: center; justify-content: center; gap: 8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.92-10.44l5.58 5.58"/></svg>
+                                Change Photo / File
+                            </button>
+
+                            <!-- Options Buttons -->
+                            <div class="upload-options" id="uploadOptions" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px; position: relative; z-index: 10;">
+                                <button type="button" class="btn-secondary" id="btnTakePhoto" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; padding: 10px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                    Take Photo
+                                </button>
+                                <button type="button" class="btn-secondary" id="btnUploadFile" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; padding: 10px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    Upload File
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cuttingRateInput">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="9.8" y1="8.2" x2="21" y2="17"/><line x1="9.8" y1="15.8" x2="21" y2="7"/></svg>
+                                    Cutting Rate
+                                </label>
+                                <input type="number" id="cuttingRateInput" name="cuttingRate" value="0.022" step="0.001" min="0.001" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="materialRateInput">
+                                    <span style="font-weight:700;font-size:14px;">₹</span>
+                                    Material Rate (₹/kg)
+                                </label>
+                                <input type="number" id="materialRateInput" name="materialRate" value="84" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="quantityInput">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                    Quantity
+                                </label>
+                                <input type="number" id="quantityInput" name="quantity" min="1" placeholder="Auto">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="scanBtn" class="btn-primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            Scan & Calculate
+                        </button>
+                    </form>
+
+                    <div id="loadingIndicator" class="loading-container hidden">
+                        <div class="spinner"></div>
+                        <p id="loadingStatusText">AI is reading your drawing...</p>
+                        <div id="loadingProgressBar" class="loading-progress-bar">
+                            <div id="loadingProgressFill" class="loading-progress-fill"></div>
+                        </div>
+                        <p id="loadingAttemptText" class="loading-attempt-text"></p>
+                    </div>
+                    
+                    <div id="errorMessage" class="error-message hidden" role="alert"></div>
+                </section>
+
+                <!-- Results Section -->
+                <section id="resultSection" class="result-section hidden">
+                    <div class="card result-card">
+                        <div class="card-header-strip"></div>
+                        <div class="card-title-row">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            <h2>Extracted from Drawing</h2>
+                        </div>
+
+                        <!-- Layer 3: Confidence Warning Banner -->
+                        <div id="confidenceWarning" class="confidence-warning hidden">
+                            <div class="confidence-warning-header">
+                                <span id="confidenceWarningIcon" class="confidence-icon">⚠️</span>
+                                <span id="confidenceWarningTitle" class="confidence-title">AI Confidence Warning</span>
+                            </div>
+                            <p id="confidenceWarningMsg" class="confidence-msg"></p>
+                            <ul id="confidenceWarningList" class="confidence-list"></ul>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <tbody>
+                                    <tr><th>Part Name</th><td id="res-partName">-</td></tr>
+                                    <tr><th>Drawing Number</th><td id="res-drawingNo">-</td></tr>
+                                    <tr><th>Shape</th><td id="res-shape">-</td></tr>
+                                    <tr><th>Length</th><td id="res-length">-</td></tr>
+                                    <tr><th>Width</th><td id="res-width">-</td></tr>
+                                    <tr><th>Diameter</th><td id="res-diameter">-</td></tr>
+                                    <tr><th>Parts (Thickness x Qty)</th><td id="res-parts">-</td></tr>
+                                    <tr><th>Holes</th><td id="res-noHoles">-</td></tr>
+                                    <tr id="row-slot-length" style="display:none;"><th>Slot Straight Lines (Length x Qty)</th><td id="res-slot-length">-</td></tr>
+                                    <tr id="row-slot-radius" style="display:none;"><th>Slot Curves (Radius x Qty)</th><td id="res-slot-radius">-</td></tr>
+                                    <tr><th>Material</th><td id="res-material">-</td></tr>
+                                    <tr><th>Quantity</th><td id="res-quantity">-</td></tr>
+                                    <tr><th>AI Confidence</th><td id="res-confidence">-</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+     
+                    <div class="card result-card hidden" id="priceCalculationCard">
+                        <div class="card-header-strip card-header-strip--red"></div>
+                        <div class="card-title-row">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <h2>Price Calculation</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table calc-table">
+                                <tbody>
+                                    <tr id="row-calc-blank-size"><th>Blank Size (with +10mm allowance)</th><td id="calc-blank-size">-</td></tr>
+                                    <tr><th>Outer Perimeter</th><td id="calc-outerPerimeter">-</td></tr>
+                                    <tr><th>Hole Perimeter</th><td id="calc-holePerimeter">-</td></tr>
+                                    <tr id="row-calc-slots" style="display:none;"><th>Slots Perimeter</th><td id="calc-slotsPerimeter">-</td></tr>
+                                    <tr><th>Total Cutting Length</th><td id="calc-totalCuttingLength">-</td></tr>
+                                    <tr><th>Start Points</th><td id="calc-startPoints">-</td></tr>
+                                    <tr><th>Weight (per 1mm) (kg)</th><td id="calc-weight">-</td></tr>
+                                    <tr><th>Material Rate (₹/kg)</th><td id="calc-materialRate">-</td></tr>
+                                    <tr><th>Material Cost (₹)</th><td id="calc-materialCost">-</td></tr>
+                                    <tr><th>Machining Cost (₹)</th><td id="calc-machiningCost">-</td></tr>
+                                    <tr class="final-amount-row">
+                                        <th>Final Amount (with 20% markup)</th>
+                                        <td id="calc-finalAmount">-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Adjustment Form Card -->
+                    <div class="card adjustment-card" id="adjustmentCard">
+                        <div class="card-header-strip" style="background-color: var(--accent-color);"></div>
+                        <div class="card-title-row">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            <h2>Verify & Calculate Price</h2>
+                            <span class="badge" style="background: var(--accent-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 10px;">REQUIRED</span>
+                        </div>
+                        <form id="adjustForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="adj-shape">Shape</label>
+                                    <select id="adj-shape">
+                                        <option value="rectangular">Rectangular</option>
+                                        <option value="circular">Circular</option>
+                                        <option value="slotted">Slotted</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="adj-order-quantity">Order Qty</label>
+                                    <input type="number" id="adj-order-quantity" min="1" value="1" required>
+                                </div>
+                                <div class="form-group" id="grp-adj-parts" style="flex: 2;">
+                                    <label for="adj-parts">Parts (Thickness x Qty)</label>
+                                    <input type="text" id="adj-parts" placeholder="e.g. 0.5x2, 1.0x1">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group" id="grp-adj-length">
+                                    <label for="adj-length">Length L (mm)</label>
+                                    <input type="number" id="adj-length" step="0.1">
+                                </div>
+                                <div class="form-group" id="grp-adj-width">
+                                    <label for="adj-width">Width W (mm)</label>
+                                    <input type="number" id="adj-width" step="0.1">
+                                </div>
+                                <div class="form-group" id="grp-adj-diameter" style="display:none;">
+                                    <label for="adj-diameter">Outer Diameter D (mm)</label>
+                                    <input type="number" id="adj-diameter" step="0.1">
+                                </div>
+                                <div class="form-group" id="grp-adj-innerd" style="display:none;">
+                                    <label for="adj-innerd">Inner Diameter d (mm)</label>
+                                    <input type="number" id="adj-innerd" step="0.1">
+                                </div>
+                            </div>
+
+                            <div id="dynamic-holes-container">
+                                <!-- Hole rows injected here -->
+                            </div>
+                            <button type="button" id="addHoleRowBtn" class="btn-secondary" style="margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                                + Add Hole Type
+                            </button>
+
+                            <div id="dynamic-slots-container" style="display:none; margin-top: 1rem;">
+                                <!-- Slot rows injected here -->
+                            </div>
+                            <button type="button" id="addSlotRowBtn" class="btn-secondary" style="display:none; margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                                + Add Slot Type
+                            </button>
+
+                            <button type="submit" id="recalcBtn" class="btn-primary" style="margin-top: 1rem; width: 100%;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                Confirm & Calculate Final Price
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="download-actions hidden" id="downloadActions">
+                        <button id="addToSessionBtn" class="btn-primary" type="button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            Add to Quotation Sheets
+                        </button>
+                        <button id="downloadExcelBtn" class="btn-secondary" type="button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download Single Excel Sheet
+                        </button>
+                        <button id="downloadPdfBtn" class="btn-secondary btn-download-pdf" type="button" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border-color: #c0392b;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download Single PDF Sheet
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="footer-logo-icon"><span>M</span></div>
+                <div>
+                    <strong>MAHEKK Industries</strong>
+                    <p>Precision Shim Manufacturer</p>
+                </div>
+            </div>
+            <div class="footer-credit">
+                <span>Design by <strong>Lexicon MILE</strong></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js?v=2"></script>
+</body>
+</html>

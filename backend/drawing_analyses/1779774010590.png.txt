@@ -1,0 +1,51 @@
+This engineering drawing depicts a simple flat washer. Here's a detailed analysis:
+
+---
+
+### Engineering Drawing Analysis: WASHER -01
+
+**1. Title Block Information:**
+
+*   **Part Name:** WASHER -01
+*   **Drawing Number:** P25119090714
+*   **Material:** MS (Most likely stands for Mild Steel)
+*   **Product:** PA2511909U07
+*   **Drawn By:** SANKALP (07-05-2026)
+*   **Checked By:** NISHKANT (07-05-2026)
+*   **Approved By:** NISHKANT (07-05-2026)
+*   **Finish Material Size / Surface Treatment / Heat Treatment:** AS STATED (meaning these specifications are likely standard or to be defined elsewhere, not on this drawing).
+*   **Units:** All dimensions are in mm.
+*   **General Tolerances (Linear):**
+    *   Above 0 upto 6 mm: ±0.1 mm
+    *   Above 6 upto 30 mm: ±0.2 mm
+    *   Above 30 upto 120 mm: ±0.3 mm
+    *   Above 120 upto 315 mm: ±0.5 mm
+
+**2. Overall Dimensions:**
+
+*   **Length:** 41 mm (Outer Diameter)
+*   **Width:** 41 mm (Outer Diameter)
+*   **Thickness / Stock Size:** 5 mm (with a tolerance of ±0.05 mm)
+
+**3. Holes:**
+
+*   **Outer Diameter (of the part):** Ø41 mm
+*   **Inner Diameter (of the central hole):** Ø17 mm
+*   **Quantity of Holes:** 1 (one central through-hole)
+
+**4. Slots:**
+
+*   There are **no slots** depicted on this drawing. The part is a simple circular washer.
+
+**5. Exact SHAPE:**
+
+*   The exact shape is **Circular / Round**. Specifically, it's an annular ring (a flat disc with a central hole), commonly known as a washer.
+
+---
+
+**Additional Information from the Drawing:**
+
+*   **Surface Finish:** The top face of the washer has a surface roughness requirement of 1.6 µm (Ra value indicated by the triangle symbol). The overall drawing suggests 3.2, 1.6, 0.8 as general surface finish options, with 1.6 being specifically called out on the top face.
+*   **Notes:**
+    1.  ALL DOWEL HOLE SHOULD BE CONTROLLED WITHIN ±0.02 (This note does not apply to this specific part as it has no dowel holes).
+    2.  ALL TAPING HOLES SHOULD BE CONTROLLED WITHIN ±0.1 (This note does not apply to this specific part as it has no tapping holes).

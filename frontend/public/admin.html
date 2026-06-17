@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Mahekk Industries</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="screen">
+        <div class="login-card">
+            <div class="logo-container">
+                <h2>Admin Login</h2>
+            </div>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required placeholder="Enter username">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn-primary" id="loginBtn">Login</button>
+            </form>
+            <div id="loginError" class="error-msg"></div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="dashboardScreen" class="screen hidden">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Mahekk Industries</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-tab="records">
+                    <i data-feather="database"></i> Records
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <i data-feather="log-out"></i> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h1>Admin Dashboard</h1>
+                <div class="user-profile">
+                    <i data-feather="user"></i> <span id="adminName">Admin</span>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Records Tab -->
+                <div id="tab-records" class="tab-content active">
+                    <div class="card table-card">
+                        <div class="card-header">
+                            <h2>All Records</h2>
+                            <div class="table-actions">
+                                <button id="refreshBtn" class="btn-secondary"><i data-feather="refresh-cw"></i> Refresh</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Part Name</th>
+                                        <th>Shape</th>
+                                        <th>Material</th>
+                                        <th>Dimensions</th>
+                                        <th>Qty</th>
+                                        <th>Total Cost</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recordsTableBody">
+                                    <!-- Rows populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="tableLoading" class="loading-spinner">
+                            <i data-feather="loader" class="spin"></i> Loading records...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

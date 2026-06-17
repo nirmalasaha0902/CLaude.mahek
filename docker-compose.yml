@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: scanner-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - ./backend/uploads:/usr/src/app/uploads
+      - ./backend/drawing_analyses:/usr/src/app/drawing_analyses
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: scanner-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
