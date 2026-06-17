@@ -630,10 +630,10 @@ async function executeAIScan(imageAsBase64, mimeType, prompt, crops = null) {
     const aiModel = process.env.MODEL_NAME || 'anthropic.claude-3-haiku-20240307-v1:0';
 
     const client = new BedrockRuntimeClient({
-        region: process.env.AWS_REGION || 'us-east-1',
+        region: process.env.CLAUDE_AWS_REGION || 'us-east-1',
         credentials: {
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+            accessKeyId: process.env.CLAUDE_AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.CLAUDE_AWS_SECRET_ACCESS_KEY
         }
     });
 
