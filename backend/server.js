@@ -477,6 +477,33 @@ const KNOWN_DRAWINGS = [
     {
         match: (e) => {
             const dno = (e.drawing_no || '').toUpperCase();
+            return dno.includes('V26010470200');
+        },
+        name: 'VENTEK Slotted Shim 86x40 (V26010470200)',
+        expectedShape: 'slotted',
+        apply: (e) => {
+            e.shape = 'slotted';
+            e.part_name = 'SHIM';
+            e.drawing_no = 'V26010470200';
+            e.L = 86;
+            e.W = 40;
+            e.D = 0;
+            e.d = 0;
+            e.material = 'MS';
+            e.parts = [
+                { thickness: 0.5, quantity: 2 },
+                { thickness: 1, quantity: 2 }
+            ];
+            e.holes = [];
+            e.slots = [
+                { slot_center_from_edge: 10, length: 30, radius: 4.5, count: 2 }
+            ];
+            e.slot_direction_dimension = 'W';
+        }
+    },
+    {
+        match: (e) => {
+            const dno = (e.drawing_no || '').toUpperCase();
             return dno.includes('MB-T2-020') || dno.includes('MB-T2');
         },
         name: 'Rectangular Shim 12x50x60',
@@ -1065,7 +1092,7 @@ Analyze carefully:
    - Do NOT confuse hole pitch distances ("=70=", "=50=") with overall L/W.
    - For circular: extract Outer Diameter (D) and Inner Diameter (d).
 7. Holes: diameter and count.
-8. Slots: slot_center_from_edge, length, radius, count, slot_direction_dimension ("L" or "W").
+8. Slots: slot_center_from_edge, length, radius, count, slot_direction_dimension ("L" or "W"). Look at which edge the slot opens from. If the slot opens from the long edge, it cuts into the Width ("W"). Be strictly accurate about the slot_direction_dimension.
 
 Return ONLY valid JSON:
 {
