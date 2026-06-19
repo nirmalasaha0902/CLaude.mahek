@@ -166,60 +166,8 @@ function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotD
         return aiLength;
     }
 
-    // AI often blindly copies the center dimension to the length dimension because it can't do math.
-    // If they are exactly the same, discard the AI length so we calculate it properly.
-    if (aiLength > 0 && Math.abs(aiLength - sCenterFromEdge) < 0.1) {
-        aiLength = 0;
-    }
-
-    let inferredDir = '';
-
-    // Check if the AI-extracted length + sCenterFromEdge matches one of the dimensions closely
-    if (aiLength > 0) {
-        const inferredTotal = aiLength + sCenterFromEdge;
-        const diffL = Math.abs(drawingL - inferredTotal);
-        const diffW = Math.abs(drawingW - inferredTotal);
-
-        if (diffL < 3 && diffL < diffW) {
-            inferredDir = 'L';
-        } else if (diffW < 3 && diffW < diffL) {
-            inferredDir = 'W';
-        }
-    }
-
-    // If not resolved by close match, fall back to slotDirectionDimension
-    if (!inferredDir) {
-        inferredDir = (slotDirectionDimension || '').toUpperCase().trim();
-    }
-
-    // Calculate length based on the resolved direction (always relative to drawing dimensions)
-    if (inferredDir === 'W') {
-        return drawingW - sCenterFromEdge;
-    } else if (inferredDir === 'L') {
-        return drawingL - sCenterFromEdge;
-    }
-
-    // Heuristic fallbacks if direction is still missing:
-    // If sCenterFromEdge is larger than drawingL but less than drawingW, slot direction must be W
-    if (sCenterFromEdge >= drawingL && sCenterFromEdge < drawingW) {
-        return drawingW - sCenterFromEdge;
-    }
-    // If sCenterFromEdge is larger than drawingW but less than drawingL, slot direction must be L
-    if (sCenterFromEdge >= drawingW && sCenterFromEdge < drawingL) {
-        return drawingL - sCenterFromEdge;
-    }
-
-    // If still undetermined but we have a positive AI length, trust the AI length
-    if (aiLength > 0) {
-        return aiLength;
-    }
-
-    // Default fallback: assume the slot cuts along the larger dimension
-    if (drawingL > drawingW) {
-        return drawingL - sCenterFromEdge;
-    } else {
-        return drawingW - sCenterFromEdge;
-    }
+    // As requested: always calculate slot length as (Width - slot center from edge)
+    return drawingW - sCenterFromEdge;
 }
 
 /**
