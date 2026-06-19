@@ -151,7 +151,121 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionStartCard.classList.remove('hidden');
         mainScannerContainer.classList.add('hidden');
         companyNameInput.value = "";
+        renderSavedSessionsList();
     }
+
+    // ── Saved Sessions Local Storage Logic ──
+    const saveSessionBtn = document.getElementById('saveSessionBtn');
+    const savedSessionsCard = document.getElementById('savedSessionsCard');
+    const savedSessionsList = document.getElementById('savedSessionsList');
+
+    function getSavedSessions() {
+        const data = localStorage.getItem('mahekk_saved_sessions');
+        return data ? JSON.parse(data) : [];
+    }
+
+    function saveSavedSessions(sessions) {
+        localStorage.setItem('mahekk_saved_sessions', JSON.stringify(sessions));
+    }
+
+    function renderSavedSessionsList() {
+        if (!savedSessionsList || !savedSessionsCard) return;
+        const sessions = getSavedSessions();
+        if (sessions.length === 0) {
+            savedSessionsCard.classList.add('hidden');
+            return;
+        }
+        
+        // Only show if not actively in a session
+        if (!sessionActive) {
+            savedSessionsCard.classList.remove('hidden');
+        } else {
+            savedSessionsCard.classList.add('hidden');
+        }
+
+        savedSessionsList.innerHTML = '';
+        sessions.sort((a, b) => b.timestamp - a.timestamp).forEach(sess => {
+            const tr = document.createElement('tr');
+            const dateStr = new Date(sess.timestamp).toLocaleString();
+            tr.innerHTML = `
+                <td><strong>${sess.companyName}</strong></td>
+                <td>${dateStr}</td>
+                <td>${sess.drawings.length} sheet(s)</td>
+                <td style="text-align: right; display: flex; gap: 8px; justify-content: flex-end;">
+                    <button class="btn-resume-session btn-primary" data-id="${sess.id}" style="padding: 4px 10px; font-size: 12px; height: auto;" type="button">Resume</button>
+                    <button class="btn-delete-session btn-danger" data-id="${sess.id}" style="padding: 4px 10px; font-size: 12px; height: auto; background: #e74c3c; border-color: #e74c3c;" type="button">Delete</button>
+                </td>
+            `;
+            savedSessionsList.appendChild(tr);
+        });
+
+        document.querySelectorAll('.btn-resume-session').forEach(btn => {
+            btn.addEventListener('click', function() {
+                resumeSession(this.getAttribute('data-id'));
+            });
+        });
+        document.querySelectorAll('.btn-delete-session').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if(confirm("Delete this saved quotation?")) {
+                    deleteSavedSession(this.getAttribute('data-id'));
+                }
+            });
+        });
+    }
+
+    function deleteSavedSession(id) {
+        let sessions = getSavedSessions();
+        sessions = sessions.filter(s => s.id !== id);
+        saveSavedSessions(sessions);
+        renderSavedSessionsList();
+    }
+
+    function resumeSession(id) {
+        const sessions = getSavedSessions();
+        const sess = sessions.find(s => s.id === id);
+        if (sess) {
+            companyName = sess.companyName;
+            sessionActive = true;
+            sessionDrawings = sess.drawings || [];
+
+            sessionCompanyNameText.textContent = companyName;
+            sessionStartCard.classList.add('hidden');
+            savedSessionsCard.classList.add('hidden');
+            mainScannerContainer.classList.remove('hidden');
+
+            renderDrawingsList();
+            resetScannerState();
+        }
+    }
+
+    if (saveSessionBtn) {
+        saveSessionBtn.addEventListener('click', () => {
+            if (sessionDrawings.length === 0) {
+                alert("No sheets to save. Add drawings to the quotation first.");
+                return;
+            }
+            let sessions = getSavedSessions();
+            const existingIndex = sessions.findIndex(s => s.companyName === companyName);
+            const sessionData = {
+                id: existingIndex >= 0 ? sessions[existingIndex].id : Date.now().toString(),
+                companyName: companyName,
+                drawings: sessionDrawings,
+                timestamp: Date.now()
+            };
+            
+            if (existingIndex >= 0) {
+                sessions[existingIndex] = sessionData;
+            } else {
+                sessions.push(sessionData);
+            }
+            saveSavedSessions(sessions);
+            alert("Session saved successfully! You can resume it later from the Previous Quotations list.");
+        });
+    }
+
+    // Initialize list
+    renderSavedSessionsList();
+
 
     function resetScannerState() {
         uploadForm.reset();

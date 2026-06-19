@@ -60,6 +60,30 @@
                 </form>
             </section>
 
+            <!-- Saved Sessions Card -->
+            <section id="savedSessionsCard" class="card hidden" style="margin-top: 20px;">
+                <div class="card-header-strip" style="background-color: #6366f1;"></div>
+                <div class="card-title-row">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <h2>Previous Quotations</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Date Saved</th>
+                                <th>Sheets</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="savedSessionsList">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Main Scanner Workspace (hidden initially) -->
             <div id="mainScannerContainer" class="hidden">
                 <!-- Session Header Banner -->
@@ -68,10 +92,16 @@
                         <span class="session-badge">Active Session</span>
                         <h3>Quotation for: <span id="sessionCompanyNameText" class="company-name-highlight">Company Name</span></h3>
                     </div>
-                    <button id="endSessionBtn" class="btn-end-session" type="button">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        New Session
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="saveSessionBtn" class="btn-primary" type="button" style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: #4f46e5; border-color: #4f46e5;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            Save Session
+                        </button>
+                        <button id="endSessionBtn" class="btn-end-session" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            New Session
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Compiled Drawings Card (shown when drawings exist in session) -->
