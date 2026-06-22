@@ -163,14 +163,15 @@ function calculateFinal(totalMachiningCost, totalMaterialCost) {
 function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotDirectionDimension, blankL, blankW) {
     let aiLength = parseFloat(defaultLength) || 0;
     
-    // As per user logic: "some photos the slot length is giving (explicitly)"
-    if (aiLength > 0) {
-        return aiLength;
+    if (sCenterFromEdge > 0) {
+        // Automatically determine the correct length whether measured from the open or closed end
+        // Slotted shims typically have slots deeper than halfway to slide over bolts
+        return Math.max(sCenterFromEdge, drawingW - sCenterFromEdge);
     }
 
-    // "if not given then width - the centre of the top curve value"
-    if (sCenterFromEdge > 0) {
-        return drawingW - sCenterFromEdge;
+    // Fallback if no edge distance was found, but AI extracted an explicit length
+    if (aiLength > 0) {
+        return aiLength;
     }
 
     return 0;
