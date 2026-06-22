@@ -163,6 +163,16 @@ function calculateFinal(totalMachiningCost, totalMaterialCost) {
 function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotDirectionDimension, blankL, blankW) {
     let aiLength = parseFloat(defaultLength) || 0;
     
+    // Safety check: The AI often confuses the horizontal slot spacing (like 47.5 or 55) 
+    // with the vertical slot length. We know the slot length or its edge distance 
+    // CANNOT physically exceed the total width of the plate (drawingW).
+    if (sCenterFromEdge >= drawingW) {
+        sCenterFromEdge = 0;
+    }
+    if (aiLength >= drawingW) {
+        aiLength = 0;
+    }
+    
     if (sCenterFromEdge > 0) {
         // Automatically determine the correct length whether measured from the open or closed end
         // Slotted shims typically have slots deeper than halfway to slide over bolts
