@@ -160,7 +160,7 @@ function calculateFinal(totalMachiningCost, totalMaterialCost) {
     return (totalMachiningCost + totalMaterialCost) * MARKUP;
 }
 
-function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotDirectionDimension, blankL, blankW, slotRadius = 0) {
+function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotDirectionDimension, blankL, blankW, slotRadius = 0, horizDims = [], vertDims = []) {
     let aiLength = parseFloat(defaultLength) || 0;
     const slotWidth = slotRadius > 0 ? slotRadius * 2 : 0;
     
@@ -177,6 +177,44 @@ function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotD
     if (slotWidth > 0) {
         if (Math.abs(sCenterFromEdge - slotWidth) < 0.1) sCenterFromEdge = 0;
         if (Math.abs(aiLength - slotWidth) < 0.1) aiLength = 0;
+    }
+
+    // --- NEW AXIS CHECKING LOGIC ---
+    const isSlotVertical = (slotDirectionDimension && slotDirectionDimension.toUpperCase() === 'W');
+    const isSlotHorizontal = (slotDirectionDimension && slotDirectionDimension.toUpperCase() === 'L');
+
+    const hasVal = (arr, val) => Array.isArray(arr) && arr.some(d => Math.abs(parseFloat(d) - val) < 0.1);
+
+    const isPurelyWrongAxis = (val) => {
+        if (!val || val <= 0) return false;
+        if (isSlotVertical) {
+            return hasVal(horizDims, val) && !hasVal(vertDims, val);
+        }
+        if (isSlotHorizontal) {
+            return hasVal(vertDims, val) && !hasVal(horizDims, val);
+        }
+        return false;
+    };
+
+    // Reject explicit values if they are purely in the wrong axis
+    if (isPurelyWrongAxis(sCenterFromEdge)) sCenterFromEdge = 0;
+    if (isPurelyWrongAxis(aiLength)) aiLength = 0;
+
+    // Fallback: If both explicit candidates were rejected or zero, hunt in the correct axis
+    if (sCenterFromEdge === 0 && aiLength === 0) {
+        let pool = [];
+        if (isSlotVertical) pool = vertDims;
+        else if (isSlotHorizontal) pool = horizDims;
+
+        if (Array.isArray(pool)) {
+            let validCandidates = pool.map(d => parseFloat(d)).filter(d => 
+                !isNaN(d) && d > 0 && d < drawingW && (slotWidth === 0 || Math.abs(d - slotWidth) > 0.1)
+            );
+            // If exactly one valid dimension exists in the correct axis, use it!
+            if (validCandidates.length === 1) {
+                aiLength = validCandidates[0];
+            }
+        }
     }
 
     // Prioritize explicit aiLength over sCenterFromEdge
@@ -202,7 +240,9 @@ function parseSlots(extracted, drawingL, drawingW, blankL, blankW) {
             const sRad = parseFloat(s.radius || s.rad || s.r || s.R || (s.width ? s.width / 2 : 0) || (s.diameter ? s.diameter / 2 : 0) || 0) || 0;
             const sCount = parseInt(s.count || s.cnt || s.qty || s.quantity || s.number || s.num || s.q || s.Q || 0) || 0;
             const rawLen = parseFloat(s.length || s.depth || s.len || s.l || s.L || 0) || 0;
-            const sLen = getSlotLength(drawingL, drawingW, sCenterFromEdge, rawLen, extracted.slot_direction_dimension, blankL, blankW, sRad);
+            const horizDims = extracted.all_horizontal_dimensions || [];
+            const vertDims = extracted.all_vertical_dimensions || [];
+            const sLen = getSlotLength(drawingL, drawingW, sCenterFromEdge, rawLen, extracted.slot_direction_dimension, blankL, blankW, sRad, horizDims, vertDims);
             
             return {
                 slot_center_from_edge: sCenterFromEdge,
