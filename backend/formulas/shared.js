@@ -217,13 +217,14 @@ function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotD
         }
     }
 
-    // Prioritize explicit aiLength over sCenterFromEdge
+    // Case 1: Slot length IS explicitly given → use it directly
     if (aiLength > 0) {
-        return Math.max(aiLength, drawingW - aiLength);
+        return aiLength;
     }
     
-    if (sCenterFromEdge > 0) {
-        return Math.max(sCenterFromEdge, drawingW - sCenterFromEdge);
+    // Case 2: Slot length NOT given, but slot_center_from_edge IS given → subtract from dimension
+    if (sCenterFromEdge > 0 && drawingW > 0) {
+        return drawingW - sCenterFromEdge;
     }
 
     return 0;
