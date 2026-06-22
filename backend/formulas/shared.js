@@ -160,28 +160,32 @@ function calculateFinal(totalMachiningCost, totalMaterialCost) {
     return (totalMachiningCost + totalMaterialCost) * MARKUP;
 }
 
-function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotDirectionDimension, blankL, blankW) {
+function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotDirectionDimension, blankL, blankW, slotRadius = 0) {
     let aiLength = parseFloat(defaultLength) || 0;
+    const slotWidth = slotRadius > 0 ? slotRadius * 2 : 0;
     
-    // Safety check: The AI often confuses the horizontal slot spacing (like 47.5 or 55) 
-    // with the vertical slot length. We know the slot length or its edge distance 
-    // CANNOT physically exceed the total width of the plate (drawingW).
+    // Safety check: ignore dimensions >= drawingW
     if (sCenterFromEdge >= drawingW) {
         sCenterFromEdge = 0;
     }
     if (aiLength >= drawingW) {
         aiLength = 0;
     }
-    
-    if (sCenterFromEdge > 0) {
-        // Automatically determine the correct length whether measured from the open or closed end
-        // Slotted shims typically have slots deeper than halfway to slide over bolts
-        return Math.max(sCenterFromEdge, drawingW - sCenterFromEdge);
+
+    // Safety check: ignore dimensions that are exactly the slot width
+    // (AI often mistakes the slot width for the slot length)
+    if (slotWidth > 0) {
+        if (Math.abs(sCenterFromEdge - slotWidth) < 0.1) sCenterFromEdge = 0;
+        if (Math.abs(aiLength - slotWidth) < 0.1) aiLength = 0;
     }
 
-    // Fallback if no edge distance was found, but AI extracted an explicit length
+    // Prioritize explicit aiLength over sCenterFromEdge
     if (aiLength > 0) {
-        return aiLength;
+        return Math.max(aiLength, drawingW - aiLength);
+    }
+    
+    if (sCenterFromEdge > 0) {
+        return Math.max(sCenterFromEdge, drawingW - sCenterFromEdge);
     }
 
     return 0;
@@ -198,7 +202,7 @@ function parseSlots(extracted, drawingL, drawingW, blankL, blankW) {
             const sRad = parseFloat(s.radius || s.rad || s.r || s.R || (s.width ? s.width / 2 : 0) || (s.diameter ? s.diameter / 2 : 0) || 0) || 0;
             const sCount = parseInt(s.count || s.cnt || s.qty || s.quantity || s.number || s.num || s.q || s.Q || 0) || 0;
             const rawLen = parseFloat(s.length || s.depth || s.len || s.l || s.L || 0) || 0;
-            const sLen = getSlotLength(drawingL, drawingW, sCenterFromEdge, rawLen, extracted.slot_direction_dimension, blankL, blankW);
+            const sLen = getSlotLength(drawingL, drawingW, sCenterFromEdge, rawLen, extracted.slot_direction_dimension, blankL, blankW, sRad);
             
             return {
                 slot_center_from_edge: sCenterFromEdge,
