@@ -162,12 +162,18 @@ function calculateFinal(totalMachiningCost, totalMaterialCost) {
 
 function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotDirectionDimension, blankL, blankW) {
     let aiLength = parseFloat(defaultLength) || 0;
-    if (sCenterFromEdge <= 0) {
+    
+    // As per user logic: "some photos the slot length is giving (explicitly)"
+    if (aiLength > 0) {
         return aiLength;
     }
 
-    // As requested: always calculate slot length as (Width - slot center from edge)
-    return drawingW - sCenterFromEdge;
+    // "if not given then width - the centre of the top curve value"
+    if (sCenterFromEdge > 0) {
+        return drawingW - sCenterFromEdge;
+    }
+
+    return 0;
 }
 
 /**
