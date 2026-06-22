@@ -213,6 +213,36 @@ const KNOWN_DRAWINGS = [
         match: (e) => {
             const dno = (e.drawing_no || '').toUpperCase();
             const name = (e.part_name || '').toUpperCase();
+            return dno.includes('S26023040611') || (name.includes('SHIM-04') && Math.abs(e.L - 100) < 10);
+        },
+        name: 'SHIM-04 100x28 (S26023040611)',
+        expectedShape: 'slotted',
+        apply: (e) => {
+            e.shape = 'slotted';
+            e.part_name = 'SHIM-04';
+            e.drawing_no = 'S26023040611';
+            e.L = 100;
+            e.W = 28;
+            e.D = 0;
+            e.d = 0;
+            e.material = 'M.S.';
+            e.parts = [
+                { thickness: 1, quantity: 2 },
+                { thickness: 0.5, quantity: 2 }
+            ];
+            e.TH = 0;
+            e.quantity = 4;
+            e.holes = [];
+            e.slots = [
+                { slot_center_from_edge: 14, length: 14, radius: 3.5, count: 4 }
+            ];
+            e.slot_direction_dimension = 'W';
+        }
+    },
+    {
+        match: (e) => {
+            const dno = (e.drawing_no || '').toUpperCase();
+            const name = (e.part_name || '').toUpperCase();
             return dno.includes('V24098010200') || dno.includes('V24098000000') || (name.includes('LOCATION UNIT-1') && name.includes('SHIM'));
         },
         name: 'VENTEK Slotted Shim 100x80 (V24098010200)',
