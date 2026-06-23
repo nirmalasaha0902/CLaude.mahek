@@ -1122,7 +1122,7 @@ Analyze carefully:
    - Do NOT confuse hole pitch distances ("=70=", "=50=") with overall L/W.
    - For circular: extract Outer Diameter (D) and Inner Diameter (d).
 7. Holes: diameter and count.
-8. Slots: slot_center_from_edge, length, radius, count, slot_direction_dimension ("L" or "W"). ONLY look for vertical depth/length dimensions for slots. IGNORE any horizontal spacing or pitch dimensions between slots. Look at which edge the slot opens from. If the slot opens from the long edge, it cuts into the Width ("W"). Be strictly accurate about the slot_direction_dimension.
+8. Slots: slot_center_from_edge, length, radius, count, slot_direction_dimension ("L" or "W"). ONLY look for vertical depth/length dimensions for slots. IGNORE any horizontal spacing or pitch dimensions between slots. Look at which edge the slot opens from. If the slot opens from the long edge, it cuts into the Width ("W"). Be strictly accurate about the slot_direction_dimension. IMPORTANT: If slots have DIFFERENT lengths/depths (e.g. 3 slots are 48mm deep and 1 slot is 22mm deep), you MUST create SEPARATE entries in the slots array for each group of different-length slots. Each entry should have its own length and count. Example: [{"length": 48, "radius": 3.5, "count": 3}, {"length": 22, "radius": 3.5, "count": 1}].
 
 Return ONLY valid JSON:
 {
