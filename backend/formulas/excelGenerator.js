@@ -223,20 +223,29 @@ function generateRectangular(ws, extracted, calc, companyName) {
 
     // Slots section (empty for rectangular)
     setCell(ws, 'B6', 'Slotted Shims', { font: S.hdr, fill: S.pink });
-    const slotLabels = ['Slot 1 Length','Slot 1 Radius','Slot 2 Length','Slot 2 Radius'];
-    for (let i = 0; i < 4; i++) {
-        const row = 6 + i;
-        setCell(ws, `C${row}`, slotLabels[i]);
-        setCell(ws, `F${row}`, 0);
-        setCell(ws, `G${row}`, 0);
-        const cellH = ws.getCell(`H${row}`);
-        if (i % 2 === 0) {
-            cellH.value = { formula: `F${row}*G${row}`, result: 0 };
-        } else {
-            cellH.value = { formula: `3.14*F${row}*G${row}`, result: 0 };
-        }
-        cellH.font = S.data;
-        cellH.border = S.border;
+    
+    // Determine dynamic number of rows based on slots if needed, default to 2
+    const maxSlots = Math.max(slots.length || 0, 2);
+    
+    for (let si = 0; si < maxSlots; si++) {
+        const lenRow = 6 + si * 2;
+        const radRow = 7 + si * 2;
+        
+        setCell(ws, `C${lenRow}`, `Slot ${si+1} Length`);
+        setCell(ws, `F${lenRow}`, 0);
+        setCell(ws, `G${lenRow}`, 0);
+        const cellH_len = ws.getCell(`H${lenRow}`);
+        cellH_len.value = { formula: `F${lenRow}*G${lenRow}`, result: 0 };
+        cellH_len.font = S.data;
+        cellH_len.border = S.border;
+
+        setCell(ws, `C${radRow}`, `Slot ${si+1} Radius`);
+        setCell(ws, `F${radRow}`, 0);
+        setCell(ws, `G${radRow}`, 0);
+        const cellH_rad = ws.getCell(`H${radRow}`);
+        cellH_rad.value = { formula: `3.14*F${radRow}*G${radRow}`, result: 0 };
+        cellH_rad.font = S.data;
+        cellH_rad.border = S.border;
     }
 
     // TOT AREA & SRT PT
@@ -248,7 +257,9 @@ function generateRectangular(ws, extracted, calc, companyName) {
     setCell(ws, 'O8', smartNum(totalValue), { fill: S.yellow });
 
     writeMaterialSection(ws, calc, parts);
-    applyBordersToDataArea(ws, 3, 9, ['B','C','D','E','F','G','H']);
+    
+    const endRow = 5 + maxSlots * 2;
+    applyBordersToDataArea(ws, 3, endRow, ['B','C','D','E','F','G','H']);
 }
 
 // ═══════════════════════════════════════════════════
@@ -296,9 +307,10 @@ function generateSlotted(ws, extracted, calc, companyName) {
         }
     }
 
-    // Row 6-9: Slots
+    // Row 6+: Slots (Dynamic)
     setCell(ws, 'B6', 'Slotted Shims', { font: S.hdr, fill: S.pink });
-    for (let si = 0; si < 2; si++) {
+    const maxSlots = Math.max(slots.length, 2);
+    for (let si = 0; si < maxSlots; si++) {
         const lenRow = 6 + si * 2;
         const radRow = 7 + si * 2;
         if (slots[si]) {
@@ -351,7 +363,9 @@ function generateSlotted(ws, extracted, calc, companyName) {
     setCell(ws, 'O8', smartNum(totalValue), { fill: S.yellow });
 
     writeMaterialSection(ws, calc, parts);
-    applyBordersToDataArea(ws, 3, 9, ['B','C','D','E','F','G','H']);
+    
+    const endRow = 5 + maxSlots * 2;
+    applyBordersToDataArea(ws, 3, endRow, ['B','C','D','E','F','G','H']);
 }
 
 // ═══════════════════════════════════════════════════

@@ -24,7 +24,14 @@ function evaluateExcelSheet(filePath, inputs, cuttingRate = 0.022) {
 
     // Inject override inputs
     Object.keys(inputs).forEach(key => {
-        sheetCells[key] = { value: inputs[key], formula: undefined };
+        if (key.startsWith('__FORMULA_')) {
+            const targetCell = key.replace('__FORMULA_', '');
+            if (!sheetCells[targetCell]) sheetCells[targetCell] = {};
+            sheetCells[targetCell].formula = inputs[key];
+        } else {
+            if (!sheetCells[key]) sheetCells[key] = {};
+            sheetCells[key].value = inputs[key];
+        }
     });
 
     // Ensure all part rows have correct formulas to fix template spreadsheet discrepancies
@@ -213,34 +220,40 @@ function calculatePricingFromExcel(drawingType, extracted, userMaterialRate, use
             }
         }
 
-        // Slots
+        // Slots - Dynamic (Unlimited)
         const slotDisplayData = parseSlots(extracted, drawingL, drawingW, L, W);
-
-        // Slot 1
-        if (slotDisplayData[0]) {
-            inputs['F6'] = slotDisplayData[0].length;
-            inputs['C6'] = slotDisplayData[0].length;
-            inputs['G6'] = slotDisplayData[0].count * 2;
-            inputs['F7'] = slotDisplayData[0].radius;
-            inputs['C7'] = slotDisplayData[0].radius;
-            inputs['G7'] = slotDisplayData[0].count;
-        } else {
-            inputs['F6'] = 0; inputs['C6'] = 0; inputs['G6'] = 0;
-            inputs['F7'] = 0; inputs['C7'] = 0; inputs['G7'] = 0;
+        const maxSlots = Math.max(slotDisplayData.length, 2); // Show at least 2 slots for UI consistency
+        
+        for (let si = 0; si < maxSlots; si++) {
+            const lenRow = 6 + si * 2;
+            const radRow = 7 + si * 2;
+            
+            if (slotDisplayData[si]) {
+                const s = slotDisplayData[si];
+                inputs[`F${lenRow}`] = s.length;
+                inputs[`C${lenRow}`] = s.length;
+                inputs[`G${lenRow}`] = s.lengthQty !== undefined ? s.lengthQty : s.count * 2;
+                inputs[`F${radRow}`] = s.radius;
+                inputs[`C${radRow}`] = s.radius;
+                inputs[`G${radRow}`] = s.radiusQty !== undefined ? s.radiusQty : s.count;
+                // Add formulas for dynamically created rows
+                inputs[`__FORMULA_H${lenRow}`] = `F${lenRow}*G${lenRow}`;
+                inputs[`__FORMULA_H${radRow}`] = `3.14*F${radRow}*G${radRow}`;
+            } else {
+                inputs[`F${lenRow}`] = 0; inputs[`C${lenRow}`] = 0; inputs[`G${lenRow}`] = 0;
+                inputs[`F${radRow}`] = 0; inputs[`C${radRow}`] = 0; inputs[`G${radRow}`] = 0;
+                inputs[`__FORMULA_H${lenRow}`] = `F${lenRow}*G${lenRow}`;
+                inputs[`__FORMULA_H${radRow}`] = `3.14*F${radRow}*G${radRow}`;
+            }
         }
-
-        // Slot 2
-        if (slotDisplayData[1]) {
-            inputs['F8'] = slotDisplayData[1].length;
-            inputs['C8'] = slotDisplayData[1].length;
-            inputs['G8'] = slotDisplayData[1].count * 2;
-            inputs['F9'] = slotDisplayData[1].radius;
-            inputs['C9'] = slotDisplayData[1].radius;
-            inputs['G9'] = slotDisplayData[1].count;
-        } else {
-            inputs['F8'] = 0; inputs['C8'] = 0; inputs['G8'] = 0;
-            inputs['F9'] = 0; inputs['C9'] = 0; inputs['G9'] = 0;
+        
+        // Dynamically override J3 to include ALL slot rows
+        // J3 = E3 (outer perimeter) + H3:H5 (holes) + H6... (slots)
+        let j3Formula = 'E3+H3+H4+H5';
+        for (let si = 0; si < maxSlots; si++) {
+            j3Formula += `+H${6 + si*2}+H${7 + si*2}`;
         }
+        inputs['__FORMULA_J3'] = j3Formula;
 
         // Parts
         for (let i = 0; i < 4; i++) {
@@ -350,11 +363,11 @@ function calculatePricingFromExcel(drawingType, extracted, userMaterialRate, use
     let slotsPerimeter = 0;
     let slotDisplayData = [];
     if (drawingType === 'slotted') {
-        const h6 = parseFloat(results['H6']) || 0;
-        const h7 = parseFloat(results['H7']) || 0;
-        const h8 = parseFloat(results['H8']) || 0;
-        const h9 = parseFloat(results['H9']) || 0;
-        slotsPerimeter = h6 + h7 + h8 + h9;
+        const maxSlots = Math.max((extracted.slots || []).length, 2);
+        for(let si=0; si < maxSlots; si++) {
+            slotsPerimeter += (parseFloat(results[`H${6 + si*2}`]) || 0);
+            slotsPerimeter += (parseFloat(results[`H${7 + si*2}`]) || 0);
+        }
 
         if (Array.isArray(extracted.slots)) {
             for (const s of extracted.slots) {
