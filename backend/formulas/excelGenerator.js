@@ -46,8 +46,8 @@ function writeParts(ws, calc, parts, startRow = 3, cuttingRate = 0.022) {
         const th = parseFloat(p.thickness) || 0;
         const q = parseInt(p.quantity) || 0;
         
-        // Determine thickness-based multiplier
-        const multiplier = th >= 3 ? (cuttingRate - 0.002) : cuttingRate;
+        // Excel uses cuttingRate for all thicknesses, do NOT subtract 0.002
+        const multiplier = cuttingRate;
         const cost = th > 0 ? (calc.totalCuttingLength * th * multiplier) + (calc.startPoints * 2) : 0;
         const value = cost * q;
         totalValue += value;
