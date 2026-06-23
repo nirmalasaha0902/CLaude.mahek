@@ -1123,9 +1123,11 @@ Analyze carefully:
    - For circular: extract Outer Diameter (D) and Inner Diameter (d).
 7. Holes: diameter and count.
 8. Slots: slot_center_from_edge, length, radius, count, slot_direction_dimension ("L" or "W"). ONLY look for vertical depth/length dimensions for slots. IGNORE any horizontal spacing or pitch dimensions between slots. Look at which edge the slot opens from. If the slot opens from the long edge, it cuts into the Width ("W"). Be strictly accurate about the slot_direction_dimension. EXTREMELY IMPORTANT: DO NOT group slots of different lengths together! If you see 5 total slots, but 3 are 48mm deep and 2 are 22mm deep, YOU MUST OUTPUT TWO SEPARATE SLOT OBJECTS. Example: [{"length": 48, "radius": 3.5, "count": 3}, {"length": 22, "radius": 3.5, "count": 2}]. If you group them into one object of count 5, the entire system fails! Output every unique size separately.
+9. Analysis Scratchpad: You MUST write down your step-by-step visual analysis of the drawing in the 'analysis_scratchpad' field FIRST. Scan the drawing from left to right. Describe every single slot you see individually and explicitly state its depth dimension before you generate the 'slots' array.
 
 Return ONLY valid JSON:
 {
+  "analysis_scratchpad": "Your step-by-step visual observations of every single slot from left to right...",
   "shape": "rectangular" | "circular" | "slotted",
   "part_name": "string or null",
   "drawing_no": "string or null",
