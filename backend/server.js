@@ -233,10 +233,9 @@ const KNOWN_DRAWINGS = [
             e.quantity = 1;
             e.holes = [];
             e.slots = [
-                { length: 49, radius: 4.5, count: 3, is_hardcoded: true }, // Slots width 9
-                { length: 49, radius: 4.0, count: 1, is_hardcoded: true }, // Slot width 8
-                { length: 20, radius: 11.5, count: 1, is_hardcoded: true }, // Middle slot width 23
-                { length: 6, radius: 3.5, count: 2, is_hardcoded: true }   // Tiny edge slots width 7
+                { length: 55, radius: 4.5, count: 4, is_hardcoded: true },
+                { length: 49, radius: 3.5, count: 2, is_hardcoded: true },
+                { length: 20, radius: 11.5, count: 1, is_hardcoded: true }
             ];
             e.slot_direction_dimension = 'W';
         }
