@@ -243,7 +243,13 @@ function parseSlots(extracted, drawingL, drawingW, blankL, blankW) {
             const rawLen = parseFloat(s.length || s.depth || s.len || s.l || s.L || 0) || 0;
             const horizDims = extracted.all_horizontal_dimensions || [];
             const vertDims = extracted.all_vertical_dimensions || [];
-            const sLen = getSlotLength(drawingL, drawingW, sCenterFromEdge, rawLen, extracted.slot_direction_dimension, blankL, blankW, sRad, horizDims, vertDims);
+            
+            let sLen;
+            if (s.is_hardcoded) {
+                sLen = rawLen;
+            } else {
+                sLen = getSlotLength(drawingL, drawingW, sCenterFromEdge, rawLen, extracted.slot_direction_dimension, blankL, blankW, sRad, horizDims, vertDims);
+            }
             
             return {
                 slot_center_from_edge: sCenterFromEdge,

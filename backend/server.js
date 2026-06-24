@@ -230,8 +230,8 @@ const KNOWN_DRAWINGS = [
             e.material = e.material || 'MS';
             e.holes = [];
             e.slots = [
-                { length: 48, radius: 3.5, count: 3 },
-                { length: 22, radius: 3.5, count: 1 }
+                { length: 48, radius: 3.5, count: 3, is_hardcoded: true },
+                { length: 22, radius: 3.5, count: 1, is_hardcoded: true }
             ];
             e.slot_direction_dimension = 'W';
         }
@@ -261,7 +261,7 @@ const KNOWN_DRAWINGS = [
             e.quantity = 4;
             e.holes = [];
             e.slots = [
-                { slot_center_from_edge: 14, length: 14, radius: 3.5, count: 4 }
+                { slot_center_from_edge: 14, length: 14, radius: 3.5, count: 4, is_hardcoded: true }
             ];
             e.slot_direction_dimension = 'W';
         }
