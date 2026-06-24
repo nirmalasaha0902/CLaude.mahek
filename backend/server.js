@@ -212,10 +212,14 @@ const KNOWN_DRAWINGS = [
     {
         match: (e) => {
             const dno = (e.drawing_no || '').toUpperCase();
+            const partName = (e.part_name || '').toUpperCase();
+            const isMatchByDimensions = ((Math.abs(e.L - 81) < 5 && Math.abs(e.W - 58) < 5) || (Math.abs(e.L - 58) < 5 && Math.abs(e.W - 81) < 5));
             const has48Slot = Array.isArray(e.slots) && e.slots.some(s => Math.abs(parseFloat(s.length) - 48) < 3 || Math.abs(parseFloat(s.depth) - 48) < 3);
-            return dno.includes('P26007130404') || dno.includes('PA2600713U04') || 
-                   ((Math.abs(e.L - 81) < 5 && Math.abs(e.W - 58) < 5) || (Math.abs(e.L - 58) < 5 && Math.abs(e.W - 81) < 5)) ||
-                   has48Slot;
+            
+            return dno.includes('P26007130404') || 
+                   dno.includes('PA2600713U04') || 
+                   isMatchByDimensions || 
+                   (has48Slot && partName.includes('PROFILE UNIT'));
         },
         name: 'PARC Slotted Shim 81x58 (P26007130404)',
         expectedShape: 'slotted',
