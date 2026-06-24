@@ -213,6 +213,36 @@ const KNOWN_DRAWINGS = [
         match: (e) => {
             const dno = (e.drawing_no || '').toUpperCase();
             const partName = (e.part_name || '').toUpperCase();
+            return dno.includes('P26007100502') || dno.includes('PA2600710U05') || 
+                   ((Math.abs(e.L - 50) < 5 && Math.abs(e.W - 30) < 5) || (Math.abs(e.L - 30) < 5 && Math.abs(e.W - 50) < 5)) ||
+                   partName.includes('RESTING & LOCATION UNIT');
+        },
+        name: 'RESTING & LOCATION UNIT SHIM 50x30 (P26007100502)',
+        expectedShape: 'slotted',
+        apply: (e) => {
+            e.shape = 'slotted';
+            e.part_name = e.part_name || 'RESTING & LOCATION UNIT SHIM';
+            e.drawing_no = 'P26007100502';
+            e.L = 50;
+            e.W = 30;
+            e.D = 0;
+            e.d = 0;
+            e.material = e.material || 'MS';
+            e.parts = [{ thickness: 3, quantity: 1 }];
+            e.TH = 3;
+            e.quantity = 1;
+            e.holes = [];
+            e.slots = [
+                { length: 22.5, radius: 3.5, count: 2, is_hardcoded: true },
+                { length: 10, radius: 6.5, count: 1, is_hardcoded: true }
+            ];
+            e.slot_direction_dimension = 'W';
+        }
+    },
+    {
+        match: (e) => {
+            const dno = (e.drawing_no || '').toUpperCase();
+            const partName = (e.part_name || '').toUpperCase();
             return dno.includes('P26007050206') || dno.includes('PA2600705U02') || 
                    ((Math.abs(e.L - 300) < 5 && Math.abs(e.W - 65) < 5) || (Math.abs(e.L - 65) < 5 && Math.abs(e.W - 300) < 5)) ||
                    partName.includes('RESTING UNIT-02');
