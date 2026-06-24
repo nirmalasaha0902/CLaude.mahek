@@ -228,6 +228,9 @@ const KNOWN_DRAWINGS = [
             e.D = 0;
             e.d = 0;
             e.material = e.material || 'MS';
+            e.parts = [{ thickness: 3, quantity: 1 }];
+            e.TH = 3;
+            e.quantity = 1;
             e.holes = [];
             e.slots = [
                 { length: 48, radius: 3.5, count: 3, is_hardcoded: true },
