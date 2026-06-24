@@ -212,6 +212,31 @@ const KNOWN_DRAWINGS = [
     {
         match: (e) => {
             const dno = (e.drawing_no || '').toUpperCase();
+            return dno.includes('P26007130404') || 
+                   ((Math.abs(e.L - 81) < 5 && Math.abs(e.W - 58) < 5) || (Math.abs(e.L - 58) < 5 && Math.abs(e.W - 81) < 5));
+        },
+        name: 'PARC Slotted Shim 81x58 (P26007130404)',
+        expectedShape: 'slotted',
+        apply: (e) => {
+            e.shape = 'slotted';
+            e.part_name = e.part_name || 'PROFILE UNIT SHIM';
+            e.drawing_no = 'P26007130404';
+            e.L = 81;
+            e.W = 58;
+            e.D = 0;
+            e.d = 0;
+            e.material = e.material || 'MS';
+            e.holes = [];
+            e.slots = [
+                { length: 48, radius: 3.5, count: 3 },
+                { length: 22, radius: 3.5, count: 1 }
+            ];
+            e.slot_direction_dimension = 'W';
+        }
+    },
+    {
+        match: (e) => {
+            const dno = (e.drawing_no || '').toUpperCase();
             const name = (e.part_name || '').toUpperCase();
             return dno.includes('S26023040611') || (name.includes('SHIM-04') && Math.abs(e.L - 100) < 10);
         },
