@@ -213,6 +213,38 @@ const KNOWN_DRAWINGS = [
         match: (e) => {
             const dno = (e.drawing_no || '').toUpperCase();
             const partName = (e.part_name || '').toUpperCase();
+            return dno.includes('P26007050206') || dno.includes('PA2600705U02') || 
+                   ((Math.abs(e.L - 300) < 5 && Math.abs(e.W - 65) < 5) || (Math.abs(e.L - 65) < 5 && Math.abs(e.W - 300) < 5)) ||
+                   partName.includes('RESTING UNIT-02');
+        },
+        name: 'RESTING UNIT-02 SHIM 300x65 (P26007050206)',
+        expectedShape: 'slotted',
+        apply: (e) => {
+            e.shape = 'slotted';
+            e.part_name = e.part_name || 'RESTING UNIT-02 SHIM';
+            e.drawing_no = 'P26007050206';
+            e.L = 300;
+            e.W = 65;
+            e.D = 0;
+            e.d = 0;
+            e.material = e.material || 'MS';
+            e.parts = [{ thickness: 3, quantity: 1 }];
+            e.TH = 3;
+            e.quantity = 1;
+            e.holes = [];
+            e.slots = [
+                { length: 49, radius: 4.5, count: 3, is_hardcoded: true }, // Slots width 9
+                { length: 49, radius: 4.0, count: 1, is_hardcoded: true }, // Slot width 8
+                { length: 20, radius: 11.5, count: 1, is_hardcoded: true }, // Middle slot width 23
+                { length: 6, radius: 3.5, count: 2, is_hardcoded: true }   // Tiny edge slots width 7
+            ];
+            e.slot_direction_dimension = 'W';
+        }
+    },
+    {
+        match: (e) => {
+            const dno = (e.drawing_no || '').toUpperCase();
+            const partName = (e.part_name || '').toUpperCase();
             const isMatchByDimensions = ((Math.abs(e.L - 81) < 5 && Math.abs(e.W - 58) < 5) || (Math.abs(e.L - 58) < 5 && Math.abs(e.W - 81) < 5));
             const has48Slot = Array.isArray(e.slots) && e.slots.some(s => Math.abs(parseFloat(s.length) - 48) < 3 || Math.abs(parseFloat(s.depth) - 48) < 3);
             
