@@ -8,7 +8,7 @@ const { Jimp } = require('jimp');
 const app = express();const port = process.env.PORT || 3000;
 
 // Setup multer for temporary disk storage
-const isServerless = process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.FUNCTIONS_EMULATOR;
+const isServerless = process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.FUNCTIONS_EMULATOR || process.env.VERCEL;
 const uploadDir = isServerless ? path.join(require('os').tmpdir(), 'uploads') : path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
