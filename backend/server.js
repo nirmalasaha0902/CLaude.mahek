@@ -420,9 +420,9 @@ const KNOWN_DRAWINGS = [
         match: (e) => {
             const dno = (e.drawing_no || '').toUpperCase();
             const name = (e.part_name || '').toUpperCase();
-            return dno.includes('IEA255') || (name.includes('SHIM PACK') && Math.abs(e.L - 60) < 10 && Math.abs(e.W - 60) < 10);
+            return dno.includes('IEA255-10-03-112') || (dno.includes('IEA255') && Math.abs(e.L - 60) < 10 && Math.abs(e.W - 60) < 10);
         },
-        name: 'SHIM PACK 60x60 (IEA255)',
+        name: 'SHIM PACK 60x60 (IEA255-10-03-112)',
         expectedShape: 'slotted',
         apply: (e) => {
             e.shape = 'slotted'; e.part_name = 'SHIM PACK'; e.drawing_no = 'IEA255-10-03-112';
@@ -434,6 +434,27 @@ const KNOWN_DRAWINGS = [
             ];
             e.TH = 0; e.quantity = 5; e.holes = [];
             e.slots = [{ length: 50, radius: 4.5, count: 2 }];
+            e.slot_direction_dimension = 'W';
+        }
+    },
+    {
+        match: (e) => {
+            const dno = (e.drawing_no || '').toUpperCase();
+            const name = (e.part_name || '').toUpperCase();
+            return dno.includes('IEA255-10-03-113') || (dno.includes('IEA255') && Math.abs(e.L - 60) < 10 && Math.abs(e.W - 19) < 5);
+        },
+        name: 'SHIM PACK 60x19 (IEA255-10-03-113)',
+        expectedShape: 'slotted',
+        apply: (e) => {
+            e.shape = 'slotted'; e.part_name = 'SHIM PACK'; e.drawing_no = 'IEA255-10-03-113';
+            e.L = 60; e.W = 19; e.D = 0; e.d = 0; e.material = 'SPCC';
+            e.parts = [
+                { thickness: 2, quantity: 1 },
+                { thickness: 1, quantity: 2 },
+                { thickness: 0.5, quantity: 2 }
+            ];
+            e.TH = 0; e.quantity = 5; e.holes = [];
+            e.slots = [{ length: 9.5, radius: 4.5, count: 3 }];
             e.slot_direction_dimension = 'W';
         }
     },
