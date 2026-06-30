@@ -491,8 +491,8 @@ const KNOWN_DRAWINGS = [
             e.shape = 'slotted'; e.part_name = 'SHIM'; e.drawing_no = 'IES222-20-F04-119';
             e.L = 125; e.W = 85; e.D = 0; e.d = 0; e.material = 'SPCC';
             e.parts = [
-                { thickness: 1, quantity: 3 },
-                { thickness: 2, quantity: 4 }
+                { thickness: 1, quantity: 4 },
+                { thickness: 2, quantity: 3 }
             ];
             e.TH = 0; e.quantity = 7; e.holes = [];
             e.slots = [{ length: 110, radius: 4.25, count: 2, is_hardcoded: true }];
