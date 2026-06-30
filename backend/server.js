@@ -462,12 +462,12 @@ const KNOWN_DRAWINGS = [
         match: (e) => {
             const dno = (e.drawing_no || '').toUpperCase();
             const name = (e.part_name || '').toUpperCase();
-            return dno.includes('IEA222-20-F04-111') || (dno.includes('IEA222') && Math.abs(e.L - 50) < 10 && Math.abs(e.W - 45) < 10);
+            return dno.includes('IES222-20-F04-111') || (dno.includes('IES222') && Math.abs(e.L - 50) < 10 && Math.abs(e.W - 45) < 10);
         },
-        name: 'SHIM PLATE 50x45 (IEA222-20-F04-111)',
+        name: 'SHIM PLATE 50x45 (IES222-20-F04-111)',
         expectedShape: 'slotted',
         apply: (e) => {
-            e.shape = 'slotted'; e.part_name = 'SHIM PLATE'; e.drawing_no = 'IEA222-20-F04-111';
+            e.shape = 'slotted'; e.part_name = 'SHIM PLATE'; e.drawing_no = 'IES222-20-F04-111';
             e.L = 50; e.W = 45; e.D = 0; e.d = 0; e.material = 'SPCC';
             e.parts = [
                 { thickness: 0.5, quantity: 2 },
