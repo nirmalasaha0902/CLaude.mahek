@@ -1821,7 +1821,7 @@ app.post(['/api/recalculate', '/recalculate'], async (req, res) => {
             material: material || 'MS',
             parts: resolvedParts,
             holes: [],
-            slots: slots || [],
+            slots: (slots || []).map(s => ({...s, is_hardcoded: true})),
             slot_direction_dimension: slot_direction_dimension || null,
             confidence: 'high'
         };

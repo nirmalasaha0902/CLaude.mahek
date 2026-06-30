@@ -164,11 +164,17 @@ function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotD
     let aiLength = parseFloat(defaultLength) || 0;
     const slotWidth = slotRadius > 0 ? slotRadius * 2 : 0;
     
-    // Safety check: ignore dimensions >= drawingW
-    if (sCenterFromEdge >= drawingW) {
+    const isSlotVertical = (slotDirectionDimension && slotDirectionDimension.toUpperCase() === 'W');
+    const isSlotHorizontal = (slotDirectionDimension && slotDirectionDimension.toUpperCase() === 'L');
+    
+    // Determine the maximum possible dimension the slot can cut into
+    const maxDim = isSlotHorizontal ? drawingL : drawingW;
+
+    // Safety check: ignore dimensions >= maxDim
+    if (sCenterFromEdge >= maxDim) {
         sCenterFromEdge = 0;
     }
-    if (aiLength >= drawingW) {
+    if (aiLength >= maxDim) {
         aiLength = 0;
     }
 
@@ -180,9 +186,6 @@ function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotD
     }
 
     // --- NEW AXIS CHECKING LOGIC ---
-    const isSlotVertical = (slotDirectionDimension && slotDirectionDimension.toUpperCase() === 'W');
-    const isSlotHorizontal = (slotDirectionDimension && slotDirectionDimension.toUpperCase() === 'L');
-
     const hasVal = (arr, val) => Array.isArray(arr) && arr.some(d => Math.abs(parseFloat(d) - val) < 0.1);
 
     const isPurelyWrongAxis = (val) => {
@@ -208,7 +211,7 @@ function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotD
 
         if (Array.isArray(pool)) {
             let validCandidates = pool.map(d => parseFloat(d)).filter(d => 
-                !isNaN(d) && d > 0 && d < drawingW && (slotWidth === 0 || Math.abs(d - slotWidth) > 0.1)
+                !isNaN(d) && d > 0 && d < maxDim && (slotWidth === 0 || Math.abs(d - slotWidth) > 0.1)
             );
             // If exactly one valid dimension exists in the correct axis, use it!
             if (validCandidates.length === 1) {
@@ -223,8 +226,8 @@ function getSlotLength(drawingL, drawingW, sCenterFromEdge, defaultLength, slotD
     }
     
     // Case 2: Slot length NOT given, but slot_center_from_edge IS given → subtract from dimension
-    if (sCenterFromEdge > 0 && drawingW > 0) {
-        return drawingW - sCenterFromEdge;
+    if (sCenterFromEdge > 0 && maxDim > 0) {
+        return maxDim - sCenterFromEdge;
     }
 
     return 0;
