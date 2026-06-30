@@ -483,6 +483,26 @@ const KNOWN_DRAWINGS = [
         match: (e) => {
             const dno = (e.drawing_no || '').toUpperCase();
             const name = (e.part_name || '').toUpperCase();
+            return dno.includes('IES222-20-F04-119') || (dno.includes('IES222') && Math.abs(e.L - 125) < 10 && Math.abs(e.W - 85) < 10) || (dno.includes('IES222') && Math.abs(e.L - 85) < 10 && Math.abs(e.W - 125) < 10);
+        },
+        name: 'SHIM PLATE 85x125 (IES222-20-F04-119)',
+        expectedShape: 'slotted',
+        apply: (e) => {
+            e.shape = 'slotted'; e.part_name = 'SHIM'; e.drawing_no = 'IES222-20-F04-119';
+            e.L = 125; e.W = 85; e.D = 0; e.d = 0; e.material = 'SPCC';
+            e.parts = [
+                { thickness: 1, quantity: 3 },
+                { thickness: 2, quantity: 4 }
+            ];
+            e.TH = 0; e.quantity = 7; e.holes = [];
+            e.slots = [{ length: 110, radius: 4.25, count: 2, is_hardcoded: true }];
+            e.slot_direction_dimension = 'L';
+        }
+    },
+    {
+        match: (e) => {
+            const dno = (e.drawing_no || '').toUpperCase();
+            const name = (e.part_name || '').toUpperCase();
             return dno.includes('30436') || dno.includes('H.30436') || (name.includes('3 HOLE SHIM') && Math.abs(e.L - 50) < 10 && Math.abs(e.W - 50) < 10);
         },
         name: 'Mahindra Slotted Shim 50x50 (H.30436.232.15.00)',
