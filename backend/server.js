@@ -412,7 +412,7 @@ const KNOWN_DRAWINGS = [
             e.L = 45; e.W = 16; e.D = 0; e.d = 0; e.material = 'SPCC';
             e.parts = [{ thickness: 2, quantity: 1 }, { thickness: 1, quantity: 2 }, { thickness: 0.5, quantity: 2 }];
             e.TH = 0; e.quantity = 5; e.holes = [];
-            e.slots = [{ slot_center_from_edge: 8, length: 8, radius: 3.5, count: 4 }];
+            e.slots = [{ slot_center_from_edge: 8, length: 8, radius: 3.5, count: 4, is_hardcoded: true }];
             e.slot_direction_dimension = 'W';
         }
     },
@@ -433,7 +433,7 @@ const KNOWN_DRAWINGS = [
                 { thickness: 0.5, quantity: 2 }
             ];
             e.TH = 0; e.quantity = 5; e.holes = [];
-            e.slots = [{ length: 50, radius: 4.5, count: 2 }];
+            e.slots = [{ length: 50, radius: 4.5, count: 2, is_hardcoded: true }];
             e.slot_direction_dimension = 'W';
         }
     },
@@ -454,7 +454,7 @@ const KNOWN_DRAWINGS = [
                 { thickness: 0.5, quantity: 2 }
             ];
             e.TH = 0; e.quantity = 5; e.holes = [];
-            e.slots = [{ length: 9.5, radius: 4.5, count: 3 }];
+            e.slots = [{ length: 9.5, radius: 4.5, count: 3, is_hardcoded: true }];
             e.slot_direction_dimension = 'W';
         }
     },
@@ -475,7 +475,7 @@ const KNOWN_DRAWINGS = [
                 { thickness: 2, quantity: 1 }
             ];
             e.TH = 0; e.quantity = 5; e.holes = [];
-            e.slots = [{ length: 40, radius: 4.5, count: 2 }];
+            e.slots = [{ length: 40, radius: 4.5, count: 2, is_hardcoded: true }];
             e.slot_direction_dimension = 'W';
         }
     },
