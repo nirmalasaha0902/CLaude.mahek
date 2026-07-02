@@ -14,19 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
         
         const row = document.createElement('div');
-        row.className = 'form-row dynamic-hole-row';
-        row.style.alignItems = 'flex-end';
-        row.style.marginBottom = '0.5rem';
+        row.className = 'dynamic-hole-row';
         row.innerHTML = `
-            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <div class="form-group">
                 <label>Hole Diameter (mm)</label>
                 <input type="number" class="hole-dia-input" step="0.1" value="${diaVal}">
             </div>
-            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <div class="form-group">
                 <label>Hole Count</label>
                 <input type="number" class="hole-count-input" min="0" value="${countVal}">
             </div>
-            <button type="button" class="btn-remove-hole" style="margin-left: 0.5rem; background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 0.5rem 0.75rem; border-radius: 4px; cursor: pointer;">X</button>
+            <button type="button" class="btn-remove-hole">X</button>
         `;
         
         row.querySelector('.btn-remove-hole').addEventListener('click', () => {
