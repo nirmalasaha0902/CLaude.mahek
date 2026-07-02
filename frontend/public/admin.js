@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminName = document.getElementById('adminName');
 
     // Reports DOM
-    const timeFilter = document.getElementById('timeFilter');
+    const searchInput = document.getElementById('searchInput');
+    const searchReportsBtn = document.getElementById('searchReportsBtn');
     const refreshReportsBtn = document.getElementById('refreshReportsBtn');
     const statFilesProduced = document.getElementById('statFilesProduced');
     const statTotalValue = document.getElementById('statTotalValue');
@@ -210,63 +211,31 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     if (refreshReportsBtn) {
-        refreshReportsBtn.addEventListener('click', fetchQuotations);
+        refreshReportsBtn.addEventListener('click', () => {
+            if (searchInput) searchInput.value = '';
+            fetchQuotations();
+        });
     }
 
-    if (timeFilter) {
-        timeFilter.addEventListener('change', () => filterAndRenderReports());
+    if (searchReportsBtn) {
+        searchReportsBtn.addEventListener('click', () => filterAndRenderReports());
+    }
+    if (searchInput) {
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') filterAndRenderReports();
+        });
     }
 
     const filterAndRenderReports = () => {
-        const filterVal = timeFilter.value;
-        const now = new Date();
-        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const startOfWeek = new Date(startOfToday);
-        startOfWeek.setDate(startOfToday.getDate() - startOfToday.getDay());
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
         
-        let filtered = allQuotations;
-
-        if (filterVal === 'today') {
-            filtered = allQuotations.filter(q => new Date(q.createdAt) >= startOfToday);
-        } else if (filterVal === 'yesterday') {
-            const startOfYesterday = new Date(startOfToday);
-            startOfYesterday.setDate(startOfYesterday.getDate() - 1);
-            filtered = allQuotations.filter(q => {
-                const d = new Date(q.createdAt);
-                return d >= startOfYesterday && d < startOfToday;
-            });
-        } else if (filterVal === 'this_week') {
-            filtered = allQuotations.filter(q => new Date(q.createdAt) >= startOfWeek);
-        } else if (filterVal === 'last_week') {
-            const startOfLastWeek = new Date(startOfWeek);
-            startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
-            filtered = allQuotations.filter(q => {
-                const d = new Date(q.createdAt);
-                return d >= startOfLastWeek && d < startOfWeek;
-            });
-        } else if (filterVal === 'this_month') {
-            filtered = allQuotations.filter(q => new Date(q.createdAt) >= startOfMonth);
-        } else if (filterVal === 'last_month') {
-            const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-            filtered = allQuotations.filter(q => {
-                const d = new Date(q.createdAt);
-                return d >= startOfLastMonth && d < startOfMonth;
-            });
-        }
-
-        // Update Stats
-        statFilesProduced.textContent = filtered.length;
-        const totalVal = filtered.reduce((sum, q) => sum + (parseFloat(q.costing) || 0), 0);
-        statTotalValue.textContent = '₹' + totalVal.toFixed(2);
-
-        // Grouping logic for sessions
-        const groupedSessions = [];
-        if (filtered.length > 0) {
-            const sortedFiltered = [...filtered].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        // 1. Group ALL quotations into sessions first
+        const allGroupedSessions = [];
+        if (allQuotations.length > 0) {
+            const sortedQuotations = [...allQuotations].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             let currentSession = null;
 
-            sortedFiltered.forEach(q => {
+            sortedQuotations.forEach(q => {
                 if (!currentSession) {
                     currentSession = {
                         createdAt: q.createdAt,
@@ -282,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         currentSession.costing += parseFloat(q.costing) || 0;
                         currentSession.createdAt = q.createdAt; // update to latest time
                     } else {
-                        groupedSessions.push(currentSession);
+                        allGroupedSessions.push(currentSession);
                         currentSession = {
                             createdAt: q.createdAt,
                             companyName: q.companyName || '-',
@@ -293,17 +262,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             if (currentSession) {
-                groupedSessions.push(currentSession);
+                allGroupedSessions.push(currentSession);
             }
             // Reverse so newest sessions are at the top
-            groupedSessions.reverse();
+            allGroupedSessions.reverse();
         }
 
-        // Render Table
-        if (groupedSessions.length === 0) {
-            reportsTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No reports found for this period.</td></tr>`;
+        // 2. Filter grouped sessions by the search query
+        let filteredSessions = allGroupedSessions;
+        if (query) {
+            filteredSessions = allGroupedSessions.filter(session => {
+                const dateStr = new Date(session.createdAt).toLocaleDateString().toLowerCase();
+                const timeStr = new Date(session.createdAt).toLocaleTimeString().toLowerCase();
+                const companyStr = (session.companyName || '').toLowerCase();
+                return dateStr.includes(query) || timeStr.includes(query) || companyStr.includes(query);
+            });
+        }
+
+        // 3. Update Stats
+        const totalFiles = filteredSessions.reduce((sum, s) => sum + s.quantity, 0);
+        const totalVal = filteredSessions.reduce((sum, s) => sum + s.costing, 0);
+        
+        statFilesProduced.textContent = totalFiles;
+        statTotalValue.textContent = '₹' + totalVal.toFixed(2);
+
+        // 4. Render Table
+        if (filteredSessions.length === 0) {
+            reportsTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No reports found for this search.</td></tr>`;
         } else {
-            reportsTableBody.innerHTML = groupedSessions.map(q => `
+            reportsTableBody.innerHTML = filteredSessions.map(q => `
                 <tr>
                     <td>${new Date(q.createdAt).toLocaleDateString()} <br><small style="color:#64748b">${new Date(q.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></td>
                     <td><strong>${q.companyName}</strong></td>
