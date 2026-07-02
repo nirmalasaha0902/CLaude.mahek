@@ -3,7 +3,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { Jimp } = require('jimp');
+const sharp = require('sharp');
 
 const app = express();const port = process.env.PORT || 3000;
 
@@ -825,28 +825,32 @@ function validateExtractedData(extracted) {
 async function createVisualCrops(imageAsBase64) {
     try {
         const buffer = Buffer.from(imageAsBase64, 'base64');
-        const image = await Jimp.read(buffer);
-        const width = image.width;
-        const height = image.height;
+        const metadata = await sharp(buffer).metadata();
+        const width = metadata.width;
+        const height = metadata.height;
         console.log(`[Visual Crops] Image loaded. Original size: ${width}x${height}`);
 
-        // Crop 1: Title Block (Bottom-right: x: 60%-100%, y: 60%-100%)
-        const titleBlockImg = image.clone().crop({
-            x: Math.floor(width * 0.60),
-            y: Math.floor(height * 0.60),
-            w: Math.floor(width * 0.40),
-            h: Math.floor(height * 0.40)
-        });
-        const titleBlockBase64 = (await titleBlockImg.getBuffer('image/png')).toString('base64');
+        const titleBlockBuffer = await sharp(buffer)
+            .extract({
+                left: Math.floor(width * 0.60),
+                top: Math.floor(height * 0.60),
+                width: Math.floor(width * 0.40),
+                height: Math.floor(height * 0.40)
+            })
+            .png()
+            .toBuffer();
+        const titleBlockBase64 = titleBlockBuffer.toString('base64');
 
-        // Crop 2: Thickness Table / Notes (Upper/Middle-right: x: 60%-100%, y: 0%-60%)
-        const tableImg = image.clone().crop({
-            x: Math.floor(width * 0.60),
-            y: 0,
-            w: Math.floor(width * 0.40),
-            h: Math.floor(height * 0.60)
-        });
-        const tableBase64 = (await tableImg.getBuffer('image/png')).toString('base64');
+        const tableBuffer = await sharp(buffer)
+            .extract({
+                left: Math.floor(width * 0.60),
+                top: 0,
+                width: Math.floor(width * 0.40),
+                height: Math.floor(height * 0.60)
+            })
+            .png()
+            .toBuffer();
+        const tableBase64 = tableBuffer.toString('base64');
 
         return { titleBlockBase64, tableBase64 };
     } catch (err) {
@@ -1391,16 +1395,10 @@ app.post(['/api/scan', '/scan'], upload.single('drawing'), async (req, res) => {
                     
                     if (largestImage) {
                         const imgBuffer = largestImage.getData();
-                        const image = await Jimp.read(imgBuffer);
-                        const MAX_DIM = 600;
-                        if (image.width > MAX_DIM || image.height > MAX_DIM) {
-                            if (image.width > image.height) {
-                                image.resize({ w: MAX_DIM });
-                            } else {
-                                image.resize({ h: MAX_DIM });
-                            }
-                        }
-                        const compressedBuffer = await image.getBuffer('image/jpeg');
+                        const compressedBuffer = await sharp(imgBuffer)
+                            .resize(600, 600, { fit: 'inside', withoutEnlargement: true })
+                            .jpeg()
+                            .toBuffer();
                         imageAsBase64 = compressedBuffer.toString('base64');
                         mimeType = 'image/jpeg';
                         console.log(`[File Processing] Extracted image from DOCX. Resized. Base64: ${Math.round(imageAsBase64.length / 1024)} KB`);
@@ -1412,23 +1410,16 @@ app.post(['/api/scan', '/scan'], upload.single('drawing'), async (req, res) => {
                 }
             } else if (mimeType.startsWith('image/')) {
                 const buffer = req.file.buffer || fs.readFileSync(req.file.path);
-                const image = await Jimp.read(buffer);
-
+                
                 // Resize to maximum 600px to reduce token count and use JPEG
-                const MAX_DIM = 600;
-                if (image.width > MAX_DIM || image.height > MAX_DIM) {
-                    if (image.width > image.height) {
-                        image.resize({ w: MAX_DIM });
-                    } else {
-                        image.resize({ h: MAX_DIM });
-                    }
-                }
-
-                // Compress as JPEG
-                const compressedBuffer = await image.getBuffer('image/jpeg');
+                const compressedBuffer = await sharp(buffer)
+                    .resize(600, 600, { fit: 'inside', withoutEnlargement: true })
+                    .jpeg()
+                    .toBuffer();
+                    
                 imageAsBase64 = compressedBuffer.toString('base64');
                 mimeType = 'image/jpeg';
-                console.log(`[Image Processing] Resized to ${image.width}x${image.height} (JPEG). Base64: ${Math.round(imageAsBase64.length / 1024)} KB`);
+                console.log(`[Image Processing] Resized (JPEG). Base64: ${Math.round(imageAsBase64.length / 1024)} KB`);
             }
         } catch (fileErr) {
             console.error("[File Processing] Processing failed, using raw file if possible:", fileErr.message);
