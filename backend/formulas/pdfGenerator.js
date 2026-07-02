@@ -150,13 +150,13 @@ async function generateSinglePdf(extracted, calc) {
 /**
  * Generate a multi-item summary quotation PDF
  */
-async function generateMultiPdf(items, companyName) {
+async function generateMultiPdf(items, companyName, quoteNoOverride) {
     const doc = new PDFDocument({ size: 'A4', margin: 40 });
     
     const cName = (companyName || 'MAHEK INDUSTRIES').toUpperCase();
     const today = new Date();
     const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
-    const quoteNo = 'MI/01/26-27';
+    const quoteNo = quoteNoOverride || 'MI/01/26-27';
 
     // Column x-coordinates
     const colX = {

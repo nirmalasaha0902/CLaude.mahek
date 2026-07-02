@@ -11,6 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const refreshBtn = document.getElementById('refreshBtn');
     const adminName = document.getElementById('adminName');
 
+    function formatDateDDMMYYYY(dateString) {
+        const d = new Date(dateString);
+        if (isNaN(d.getTime())) return '';
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
     // Reports DOM
     const searchInput = document.getElementById('searchInput');
     const searchReportsBtn = document.getElementById('searchReportsBtn');
@@ -138,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         recordsTableBody.innerHTML = records.map(r => `
             <tr>
-                <td>${new Date(r.createdAt).toLocaleDateString()} ${new Date(r.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</td>
+                <td>${formatDateDDMMYYYY(r.createdAt)} ${new Date(r.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</td>
                 <td><span class="badge ${r.entryType}">${r.entryType}</span></td>
                 <td><strong>${r.partName}</strong><br><small style="color:#64748b">${r.drawingNumber}</small></td>
                 <td style="text-transform: capitalize;">${r.shape}</td>
@@ -272,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredSessions = allGroupedSessions;
         if (query) {
             filteredSessions = allGroupedSessions.filter(session => {
-                const dateStr = new Date(session.createdAt).toLocaleDateString().toLowerCase();
+                const dateStr = formatDateDDMMYYYY(session.createdAt).toLowerCase();
                 const timeStr = new Date(session.createdAt).toLocaleTimeString().toLowerCase();
                 const companyStr = (session.companyName || '').toLowerCase();
                 return dateStr.includes(query) || timeStr.includes(query) || companyStr.includes(query);
@@ -340,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             reportsTableBody.innerHTML = filteredSessions.map(q => `
                 <tr>
-                    <td>${new Date(q.createdAt).toLocaleDateString()} <br><small style="color:#64748b">${new Date(q.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></td>
+                    <td>${formatDateDDMMYYYY(q.createdAt)} <br><small style="color:#64748b">${new Date(q.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></td>
                     <td><strong>${q.companyName}</strong></td>
                     <td>${q.quantity}</td>
                     <td><strong>₹${parseFloat(q.costing || 0).toFixed(2)}</strong></td>

@@ -398,12 +398,12 @@ async function generateExcel(extracted, calculation) {
     return workbook;
 }
 
-async function generateMultiExcel(items, companyName) {
+async function generateMultiExcel(items, companyName, quoteNoOverride) {
     const workbook = new ExcelJS.Workbook();
 
     // Add Combined summary sheet
     const combinedWs = workbook.addWorksheet('Combined');
-    generateCombinedSheet(combinedWs, items, companyName);
+    generateCombinedSheet(combinedWs, items, companyName, quoteNoOverride);
 
     return workbook;
 }
@@ -440,7 +440,7 @@ const C_STYLES = {
     }
 };
 
-function generateCombinedSheet(ws, items, companyName) {
+function generateCombinedSheet(ws, items, companyName, quoteNoOverride) {
     // Set exact column widths matching FINALEXCEL
     ws.columns = [
         { width: 9.3 },  // Sr. No.
@@ -454,7 +454,7 @@ function generateCombinedSheet(ws, items, companyName) {
     const cName = (companyName || 'MAHEK INDUSTRIES').toUpperCase();
     const today = new Date();
     const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
-    const quoteNo = 'MI/01/26-27';
+    const quoteNo = quoteNoOverride || 'MI/01/26-27';
 
     // Row 1: Company Name
     ws.mergeCells('A1:F1');

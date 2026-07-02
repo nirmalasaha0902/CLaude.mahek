@@ -1891,12 +1891,12 @@ app.post(['/api/download-excel', '/download-excel'], express.json(), async (req,
 
 app.post(['/api/download-excel-multi', '/download-excel-multi'], express.json(), async (req, res) => {
     try {
-        const { companyName, items } = req.body;
+        const { companyName, items, quoteNo } = req.body;
         if (!Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ error: 'Missing or empty drawings items list' });
         }
 
-        const workbook = await generateMultiExcel(items, companyName);
+        const workbook = await generateMultiExcel(items, companyName, quoteNo);
         const namePart = (companyName || 'Multi').replace(/[^a-zA-Z0-9]/g, '_');
         const filename = `Shim_Quote_Session_${namePart}.xlsx`;
 
@@ -1907,6 +1907,31 @@ app.post(['/api/download-excel-multi', '/download-excel-multi'], express.json(),
     } catch (error) {
         console.error('Excel multi-generation error:', error);
         res.status(500).json({ error: 'Failed to generate Excel file' });
+    }
+});
+
+// ============================================================
+// Sequence tracking for quotation numbers
+// ============================================================
+app.get('/api/next-quote-number', async (req, res) => {
+    try {
+        let val = 1;
+        if (pool) {
+            await pool.query(`CREATE TABLE IF NOT EXISTS quotation_sequence (id INT PRIMARY KEY, current_val INT)`);
+            const seqRes = await pool.query(`SELECT current_val FROM quotation_sequence WHERE id = 1`);
+            if (seqRes.rows.length === 0) {
+                await pool.query(`INSERT INTO quotation_sequence (id, current_val) VALUES (1, 1)`);
+            } else {
+                val = seqRes.rows[0].current_val + 1;
+                if (val > 1000) val = 1;
+                await pool.query(`UPDATE quotation_sequence SET current_val = $1 WHERE id = 1`, [val]);
+            }
+        }
+        const formattedVal = String(val).padStart(2, '0');
+        res.json({ quoteNumber: `MI/${formattedVal}/26-27` });
+    } catch (e) {
+        console.error('Sequence error:', e);
+        res.json({ quoteNumber: `MI/01/26-27` }); // fallback
     }
 });
 
@@ -1937,12 +1962,12 @@ app.post(['/api/download-pdf', '/download-pdf'], express.json(), async (req, res
 
 app.post(['/api/download-pdf-multi', '/download-pdf-multi'], express.json(), async (req, res) => {
     try {
-        const { companyName, items } = req.body;
+        const { companyName, items, quoteNo } = req.body;
         if (!Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ error: 'Missing or empty drawings items list' });
         }
 
-        const pdfBuffer = await generateMultiPdf(items, companyName);
+        const pdfBuffer = await generateMultiPdf(items, companyName, quoteNo);
         const namePart = (companyName || 'Multi').replace(/[^a-zA-Z0-9]/g, '_');
         const filename = `Shim_Quote_Session_${namePart}.pdf`;
 

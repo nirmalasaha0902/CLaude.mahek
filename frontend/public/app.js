@@ -3,6 +3,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let sessionActive = false;
     let companyName = "";
     let sessionDrawings = []; // array of { id, sheetTabName, displayName, shape, qty, cost, extracted, calculation }
+    let sessionQuoteNumber = null;
+
+    async function getQuoteNumber() {
+        if (sessionQuoteNumber) return sessionQuoteNumber;
+        try {
+            const res = await fetch('/api/next-quote-number');
+            const data = await res.json();
+            sessionQuoteNumber = data.quoteNumber;
+        } catch (e) {
+            console.error('Failed to get quote number', e);
+            sessionQuoteNumber = 'MI/01/26-27';
+        }
+        return sessionQuoteNumber;
+    }
 
     // Store last scan data for Excel download / adjustments
     let lastExtracted = null;
@@ -673,12 +687,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     calculation: d.calculation
                 }));
 
+                const currentQuoteNo = await getQuoteNumber();
+
                 const response = await fetch('/api/download-excel-multi', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         companyName: companyName,
-                        items: payloadItems
+                        items: payloadItems,
+                        quoteNo: currentQuoteNo
                     })
                 });
 
@@ -729,12 +746,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     calculation: d.calculation
                 }));
 
+                const currentQuoteNo = await getQuoteNumber();
+
                 const response = await fetch('/api/download-pdf-multi', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         companyName: companyName,
-                        items: payloadItems
+                        items: payloadItems,
+                        quoteNo: currentQuoteNo
                     })
                 });
 
