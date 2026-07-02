@@ -862,7 +862,7 @@ async function executeAIScan(imageAsBase64, mimeType, prompt, crops = null) {
     let lastError = null;
     let aiText = null;
 
-    const aiModel = process.env.MODEL_NAME || 'anthropic.claude-3-haiku-20240307-v1:0';
+    const aiModel = process.env.MODEL_NAME || 'us.anthropic.claude-opus-4-6-v1';
 
     const client = new BedrockRuntimeClient({
         region: process.env.CLAUDE_AWS_REGION || 'us-east-1',
@@ -1303,11 +1303,9 @@ Analyze carefully:
 8. Slots: slot_center_from_edge, length, radius, count, slot_direction_dimension ("L" or "W"). ONLY look for vertical depth/length dimensions for slots. IGNORE any horizontal spacing or pitch dimensions between slots.
    - CAUTION ON SLOT LENGTH: Do NOT mistake positional dimensions (e.g. distance from the closed edge to the slot center) for the slot's actual length. If a drawing shows the part's overall length (e.g., 60) and the distance from the closed back edge to the slot center (e.g., 10), you MUST calculate the slot length yourself: (Overall Dimension) - (Back Edge Distance) = (60 - 10 = 50). Do NOT just output the positional dimension! Calculate this explicitly in the scratchpad.
    - Look at which edge the slot opens from. If the slot opens from the long edge, it cuts into the Width ("W"). Be strictly accurate about the slot_direction_dimension. EXTREMELY IMPORTANT: DO NOT group slots of different lengths together! If you see 5 total slots, but 3 are 48mm deep and 2 are 22mm deep, YOU MUST OUTPUT TWO SEPARATE SLOT OBJECTS. Example: [{"length": 48, "radius": 3.5, "count": 3}, {"length": 22, "radius": 3.5, "count": 2}]. If you group them into one object of count 5, the entire system fails! Output every unique size separately.
-9. Analysis Scratchpad: You MUST write down your step-by-step visual analysis of the drawing in the 'analysis_scratchpad' field FIRST. Scan the drawing from left to right. Describe every single slot you see individually and explicitly state its depth dimension before you generate the 'slots' array.
 
 Return ONLY valid JSON:
 {
-  "analysis_scratchpad": "Your step-by-step visual observations of every single slot from left to right...",
   "shape": "rectangular" | "circular" | "slotted",
   "part_name": "string or null",
   "drawing_no": "string or null",
@@ -1394,7 +1392,7 @@ app.post(['/api/scan', '/scan'], upload.single('drawing'), async (req, res) => {
                     if (largestImage) {
                         const imgBuffer = largestImage.getData();
                         const image = await Jimp.read(imgBuffer);
-                        const MAX_DIM = 800;
+                        const MAX_DIM = 600;
                         if (image.width > MAX_DIM || image.height > MAX_DIM) {
                             if (image.width > image.height) {
                                 image.resize({ w: MAX_DIM });
@@ -1416,8 +1414,8 @@ app.post(['/api/scan', '/scan'], upload.single('drawing'), async (req, res) => {
                 const buffer = req.file.buffer || fs.readFileSync(req.file.path);
                 const image = await Jimp.read(buffer);
 
-                // Resize to maximum 800px to reduce token count and use JPEG
-                const MAX_DIM = 800;
+                // Resize to maximum 600px to reduce token count and use JPEG
+                const MAX_DIM = 600;
                 if (image.width > MAX_DIM || image.height > MAX_DIM) {
                     if (image.width > image.height) {
                         image.resize({ w: MAX_DIM });
