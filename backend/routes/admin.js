@@ -41,6 +41,20 @@ router.get('/setup', async (req, res) => {
             );
         `);
 
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS quotations (
+                id SERIAL PRIMARY KEY,
+                company_name VARCHAR(255),
+                drawing_details VARCHAR(255),
+                shape VARCHAR(50),
+                quantity INTEGER,
+                costing NUMERIC,
+                extracted_data JSONB,
+                calculation_data JSONB,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
         const adminResult = await pool.query('SELECT * FROM admins LIMIT 1');
         if (adminResult.rows.length > 0) {
             return res.status(400).json({ error: 'Setup already completed. Admin exists.' });
@@ -154,3 +168,52 @@ router.delete('/records/:id', auth, async (req, res) => {
 });
 
 module.exports = router;
+
+// Get all quotations (Protected)
+router.get('/quotations', auth, async (req, res) => {
+    if (!pool) return res.status(500).json({ error: 'Database not connected.' });
+
+    try {
+        const result = await pool.query('SELECT * FROM quotations ORDER BY created_at DESC');
+        
+        const quotations = result.rows.map(r => ({
+            _id: r.id,
+            companyName: r.company_name,
+            drawingDetails: r.drawing_details,
+            shape: r.shape,
+            quantity: r.quantity,
+            costing: r.costing,
+            extractedData: r.extracted_data,
+            calculationData: r.calculation_data,
+            createdAt: r.created_at
+        }));
+        
+        res.json(quotations);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Create a quotation record (No auth needed, done by public facing app)
+router.post('/quotations', async (req, res) => {
+    if (!pool) return res.status(500).json({ error: 'Database not connected.' });
+
+    try {
+        const { companyName, drawingDetails, shape, quantity, costing, extractedData, calculationData } = req.body;
+        
+        const result = await pool.query(`
+            INSERT INTO quotations (
+                company_name, drawing_details, shape, quantity, costing, extracted_data, calculation_data
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *
+        `, [
+            companyName, drawingDetails, shape, quantity, costing, 
+            JSON.stringify(extractedData || {}), JSON.stringify(calculationData || {})
+        ]);
+        
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Failed to insert quotation:', err);
+        res.status(500).json({ error: err.message });
+    }
+});

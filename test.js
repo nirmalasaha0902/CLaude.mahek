@@ -1828,4 +1828,4 @@ if (require.main === module) {
 }
 module.exports = app;
 
-const e = { drawing_no: 'P26007130404', shape: 'slotted', L: 81, W: 58, slots: [{length: 48, count: 5}], all_horizontal_dimensions: [48], all_vertical_dimensions: [] }; applyKnownDrawingCorrection(e); const { parseSlots } = require('./formulas/shared'); e.slots = parseSlots(e, e.L, e.W); console.log(e);
+const e = { drawing_no: 'P26007130404', shape: 'slotted', L: 81, W: 58, slots: [{length: 48, count: 5}] }; console.log('MATCH:', applyKnownDrawingCorrection(e)); console.log(e);

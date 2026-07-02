@@ -477,6 +477,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 calculation: JSON.parse(JSON.stringify(lastCalculation))
             });
 
+            // Save to Neon DB via admin API
+            fetch('/api/admin/quotations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    companyName: companyName || 'Unknown Company',
+                    drawingDetails: displayName,
+                    shape: shape,
+                    quantity: qty,
+                    costing: cost,
+                    extractedData: lastExtracted,
+                    calculationData: lastCalculation
+                })
+            }).catch(err => console.error('Failed to log quotation to DB:', err));
+
             renderDrawingsList();
             resetScannerState();
 

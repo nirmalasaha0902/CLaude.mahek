@@ -11,6 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const refreshBtn = document.getElementById('refreshBtn');
     const adminName = document.getElementById('adminName');
 
+    // Reports DOM
+    const timeFilter = document.getElementById('timeFilter');
+    const refreshReportsBtn = document.getElementById('refreshReportsBtn');
+    const statFilesProduced = document.getElementById('statFilesProduced');
+    const statTotalValue = document.getElementById('statTotalValue');
+    const reportsTableBody = document.getElementById('reportsTableBody');
+    const reportsTableLoading = document.getElementById('reportsTableLoading');
+    let allQuotations = [];
+
     // Auth Check
     const checkAuth = () => {
         const token = localStorage.getItem('adminToken');
@@ -18,6 +27,32 @@ document.addEventListener('DOMContentLoaded', () => {
             loginScreen.classList.add('hidden');
             dashboardScreen.classList.remove('hidden');
             adminName.textContent = localStorage.getItem('adminUser') || 'Admin';
+            
+            // Tab switching setup
+            const navItems = document.querySelectorAll('.nav-item[data-tab]');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navItems.forEach(n => n.classList.remove('active'));
+                    tabContents.forEach(t => t.style.display = 'none');
+                    item.classList.add('active');
+                    
+                    const tabId = item.getAttribute('data-tab');
+                    const targetTab = document.getElementById(`tab-${tabId}`);
+                    if (targetTab) {
+                        targetTab.style.display = 'block';
+                        if (tabId === 'records') fetchRecords();
+                        if (tabId === 'reports') fetchQuotations();
+                    }
+                });
+            });
+
+            // Initial load (Records tab is active by default in HTML)
+            document.querySelector('.nav-item[data-tab="records"]').classList.add('active');
+            document.getElementById('tab-records').style.display = 'block';
+            document.getElementById('tab-reports').style.display = 'none';
             fetchRecords();
         } else {
             loginScreen.classList.remove('hidden');
@@ -146,6 +181,101 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Delete failed', err);
             alert('Failed to delete record');
         }
+    };
+
+    // --- Reports Logic ---
+    const fetchQuotations = async () => {
+        reportsTableBody.innerHTML = '';
+        reportsTableLoading.classList.remove('hidden');
+        const token = localStorage.getItem('adminToken');
+
+        try {
+            const res = await fetch('/api/admin/quotations', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('adminToken');
+                checkAuth();
+                return;
+            }
+            allQuotations = await res.json();
+            filterAndRenderReports();
+        } catch (err) {
+            console.error('Failed to fetch quotations:', err);
+            reportsTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Failed to load reports.</td></tr>`;
+        } finally {
+            reportsTableLoading.classList.add('hidden');
+            feather.replace();
+        }
+    };
+
+    if (refreshReportsBtn) {
+        refreshReportsBtn.addEventListener('click', fetchQuotations);
+    }
+
+    if (timeFilter) {
+        timeFilter.addEventListener('change', () => filterAndRenderReports());
+    }
+
+    const filterAndRenderReports = () => {
+        const filterVal = timeFilter.value;
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfWeek = new Date(startOfToday);
+        startOfWeek.setDate(startOfToday.getDate() - startOfToday.getDay());
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        let filtered = allQuotations;
+
+        if (filterVal === 'today') {
+            filtered = allQuotations.filter(q => new Date(q.createdAt) >= startOfToday);
+        } else if (filterVal === 'yesterday') {
+            const startOfYesterday = new Date(startOfToday);
+            startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+            filtered = allQuotations.filter(q => {
+                const d = new Date(q.createdAt);
+                return d >= startOfYesterday && d < startOfToday;
+            });
+        } else if (filterVal === 'this_week') {
+            filtered = allQuotations.filter(q => new Date(q.createdAt) >= startOfWeek);
+        } else if (filterVal === 'last_week') {
+            const startOfLastWeek = new Date(startOfWeek);
+            startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
+            filtered = allQuotations.filter(q => {
+                const d = new Date(q.createdAt);
+                return d >= startOfLastWeek && d < startOfWeek;
+            });
+        } else if (filterVal === 'this_month') {
+            filtered = allQuotations.filter(q => new Date(q.createdAt) >= startOfMonth);
+        } else if (filterVal === 'last_month') {
+            const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            filtered = allQuotations.filter(q => {
+                const d = new Date(q.createdAt);
+                return d >= startOfLastMonth && d < startOfMonth;
+            });
+        }
+
+        // Update Stats
+        statFilesProduced.textContent = filtered.length;
+        const totalVal = filtered.reduce((sum, q) => sum + (parseFloat(q.costing) || 0), 0);
+        statTotalValue.textContent = '₹' + totalVal.toFixed(2);
+
+        // Render Table
+        if (filtered.length === 0) {
+            reportsTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No reports found for this period.</td></tr>`;
+        } else {
+            reportsTableBody.innerHTML = filtered.map(q => `
+                <tr>
+                    <td>${new Date(q.createdAt).toLocaleDateString()} <br><small style="color:#64748b">${new Date(q.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></td>
+                    <td><strong>${q.companyName || '-'}</strong></td>
+                    <td>${q.drawingDetails || '-'}</td>
+                    <td style="text-transform: capitalize;">${q.shape || '-'}</td>
+                    <td>${q.quantity || 0}</td>
+                    <td><strong>₹${parseFloat(q.costing || 0).toFixed(2)}</strong></td>
+                </tr>
+            `).join('');
+        }
+        feather.replace();
     };
 
     // Init

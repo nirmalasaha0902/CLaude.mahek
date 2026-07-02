@@ -41,6 +41,9 @@
                 <a href="#" class="nav-item active" data-tab="records">
                     <i data-feather="database"></i> Records
                 </a>
+                <a href="#" class="nav-item" data-tab="reports">
+                    <i data-feather="pie-chart"></i> Reports
+                </a>
                 <a href="#" class="nav-item" id="logoutBtn">
                     <i data-feather="log-out"></i> Logout
                 </a>
@@ -87,6 +90,60 @@
                         </div>
                         <div id="tableLoading" class="loading-spinner">
                             <i data-feather="loader" class="spin"></i> Loading records...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="tab-reports" class="tab-content" style="display: none;">
+                    <div class="reports-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <h2>Quotation Reports</h2>
+                        <div class="filter-group" style="display:flex; align-items:center;">
+                            <label for="timeFilter" style="margin-right: 0.5rem; font-weight: 500;">Time Period: </label>
+                            <select id="timeFilter" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; font-family: 'Inter', sans-serif;">
+                                <option value="today">Today</option>
+                                <option value="yesterday">Yesterday</option>
+                                <option value="this_week">This Week</option>
+                                <option value="last_week">Last Week</option>
+                                <option value="this_month">This Month</option>
+                                <option value="last_month">Last Month</option>
+                                <option value="all_time" selected>All Time</option>
+                            </select>
+                            <button id="refreshReportsBtn" class="btn-secondary" style="margin-left: 0.5rem; padding: 0.4rem 0.6rem;"><i data-feather="refresh-cw"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="stats-row" style="display:flex; gap:1.5rem; margin-bottom:1.5rem;">
+                        <div class="stat-card card" style="flex:1; padding:1.5rem; text-align:center;">
+                            <h3 style="margin-bottom:0.5rem; color:#64748b; font-size:1rem; font-weight: 500;">Files Produced (Results Taken)</h3>
+                            <div id="statFilesProduced" style="font-size:2.5rem; font-weight:700; color:#0f172a;">0</div>
+                        </div>
+                        <div class="stat-card card" style="flex:1; padding:1.5rem; text-align:center;">
+                            <h3 style="margin-bottom:0.5rem; color:#64748b; font-size:1rem; font-weight: 500;">Total Quotation Value</h3>
+                            <div id="statTotalValue" style="font-size:2.5rem; font-weight:700; color:#10b981;">₹0</div>
+                        </div>
+                    </div>
+
+                    <div class="card table-card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date & Time</th>
+                                        <th>Company Name</th>
+                                        <th>Drawing Details</th>
+                                        <th>Shape</th>
+                                        <th>Qty</th>
+                                        <th>Total Costing</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportsTableBody">
+                                    <!-- Rows populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="reportsTableLoading" class="loading-spinner hidden">
+                            <i data-feather="loader" class="spin"></i> Loading reports...
                         </div>
                     </div>
                 </div>
