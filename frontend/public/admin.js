@@ -260,17 +260,54 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalVal = filtered.reduce((sum, q) => sum + (parseFloat(q.costing) || 0), 0);
         statTotalValue.textContent = '₹' + totalVal.toFixed(2);
 
+        // Grouping logic for sessions
+        const groupedSessions = [];
+        if (filtered.length > 0) {
+            const sortedFiltered = [...filtered].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            let currentSession = null;
+
+            sortedFiltered.forEach(q => {
+                if (!currentSession) {
+                    currentSession = {
+                        createdAt: q.createdAt,
+                        companyName: q.companyName || '-',
+                        quantity: 1, 
+                        costing: parseFloat(q.costing) || 0
+                    };
+                } else {
+                    const timeDiff = Math.abs(new Date(q.createdAt) - new Date(currentSession.createdAt)) / (1000 * 60);
+                    // If same company and within 120 minutes of the last scan in this session, group them
+                    if ((q.companyName || '-') === currentSession.companyName && timeDiff < 120) {
+                        currentSession.quantity += 1;
+                        currentSession.costing += parseFloat(q.costing) || 0;
+                        currentSession.createdAt = q.createdAt; // update to latest time
+                    } else {
+                        groupedSessions.push(currentSession);
+                        currentSession = {
+                            createdAt: q.createdAt,
+                            companyName: q.companyName || '-',
+                            quantity: 1,
+                            costing: parseFloat(q.costing) || 0
+                        };
+                    }
+                }
+            });
+            if (currentSession) {
+                groupedSessions.push(currentSession);
+            }
+            // Reverse so newest sessions are at the top
+            groupedSessions.reverse();
+        }
+
         // Render Table
-        if (filtered.length === 0) {
-            reportsTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No reports found for this period.</td></tr>`;
+        if (groupedSessions.length === 0) {
+            reportsTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No reports found for this period.</td></tr>`;
         } else {
-            reportsTableBody.innerHTML = filtered.map(q => `
+            reportsTableBody.innerHTML = groupedSessions.map(q => `
                 <tr>
                     <td>${new Date(q.createdAt).toLocaleDateString()} <br><small style="color:#64748b">${new Date(q.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></td>
-                    <td><strong>${q.companyName || '-'}</strong></td>
-                    <td>${q.drawingDetails || '-'}</td>
-                    <td style="text-transform: capitalize;">${q.shape || '-'}</td>
-                    <td>${q.quantity || 0}</td>
+                    <td><strong>${q.companyName}</strong></td>
+                    <td>${q.quantity}</td>
                     <td><strong>₹${parseFloat(q.costing || 0).toFixed(2)}</strong></td>
                 </tr>
             `).join('');
