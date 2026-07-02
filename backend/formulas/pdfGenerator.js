@@ -158,35 +158,6 @@ async function generateMultiPdf(items, companyName) {
     const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
     const quoteNo = 'MI/01/26-27';
 
-    // 1. Top Company Banner (Brown/Rust)
-    doc.rect(40, 40, 515, 45).fill('#B25E25');
-    doc.fillColor('#FFFFFF')
-       .font('Helvetica-Bold')
-       .fontSize(22)
-       .text(cName, 40, 52, { width: 515, align: 'center' });
-
-    // 2. Subtitle Banner (Light Orange)
-    doc.rect(40, 85, 515, 30).fill('#F4B183');
-    doc.fillColor('#000000')
-       .font('Helvetica-Bold')
-       .fontSize(14)
-       .text('QUOTATION With Mtl', 40, 93, { width: 515, align: 'center' });
-
-    // 3. Info Block
-    doc.rect(40, 115, 515, 20).fill('#F4B183');
-    doc.fillColor('#000000')
-       .font('Helvetica-Bold')
-       .fontSize(9);
-    doc.text(`Quotation no: ${quoteNo}`, 50, 121);
-    doc.text(`Quotation Date: ${formattedDate}`, 400, 121, { align: 'right', width: 145 });
-
-    // 4. Table Headers
-    const tableY = 150;
-    doc.rect(40, tableY, 515, 25).fill('#FBE5D6');
-    doc.strokeColor('#000000').lineWidth(1).rect(40, tableY, 515, 25).stroke();
-    
-    doc.fillColor('#000000').font('Helvetica-Bold').fontSize(9);
-    
     // Column x-coordinates
     const colX = {
         sr: 40,
@@ -196,20 +167,59 @@ async function generateMultiPdf(items, companyName) {
         rate: 405,
         amt: 475
     };
-    
-    doc.text('Sr. No.', colX.sr, tableY + 8, { width: 45, align: 'center' });
-    doc.text('Item Cd', colX.itemCd, tableY + 8, { width: 110, align: 'center' });
-    doc.text('Description', colX.desc, tableY + 8, { width: 150, align: 'center' });
-    doc.text('Po Qty', colX.qty, tableY + 8, { width: 60, align: 'center' });
-    doc.text('Rate', colX.rate, tableY + 8, { width: 70, align: 'center' });
-    doc.text('Amount', colX.amt, tableY + 8, { width: 80, align: 'center' });
 
-    // 5. Data Rows
-    let currentY = tableY + 25;
+    // Helper to draw the header on any page
+    const drawPageHeader = () => {
+        // 1. Top Company Banner (Brown/Rust)
+        doc.rect(40, 40, 515, 45).fill('#B25E25');
+        doc.fillColor('#FFFFFF')
+           .font('Helvetica-Bold')
+           .fontSize(22)
+           .text(cName, 40, 52, { width: 515, align: 'center' });
+
+        // 2. Subtitle Banner (Light Orange)
+        doc.rect(40, 85, 515, 30).fill('#F4B183');
+        doc.fillColor('#000000')
+           .font('Helvetica-Bold')
+           .fontSize(14)
+           .text('QUOTATION With Mtl', 40, 93, { width: 515, align: 'center' });
+
+        // 3. Info Block
+        doc.rect(40, 115, 515, 20).fill('#F4B183');
+        doc.fillColor('#000000')
+           .font('Helvetica-Bold')
+           .fontSize(9);
+        doc.text(`Quotation no: ${quoteNo}`, 50, 121);
+        doc.text(`Quotation Date: ${formattedDate}`, 400, 121, { align: 'right', width: 145 });
+
+        // 4. Table Headers
+        const tableY = 150;
+        doc.rect(40, tableY, 515, 25).fill('#FBE5D6');
+        doc.strokeColor('#000000').lineWidth(1).rect(40, tableY, 515, 25).stroke();
+        
+        doc.fillColor('#000000').font('Helvetica-Bold').fontSize(9);
+        
+        doc.text('Sr. No.', colX.sr, tableY + 8, { width: 45, align: 'center' });
+        doc.text('Item Cd', colX.itemCd, tableY + 8, { width: 110, align: 'center' });
+        doc.text('Description', colX.desc, tableY + 8, { width: 150, align: 'center' });
+        doc.text('Po Qty', colX.qty, tableY + 8, { width: 60, align: 'center' });
+        doc.text('Rate', colX.rate, tableY + 8, { width: 70, align: 'center' });
+        doc.text('Amount', colX.amt, tableY + 8, { width: 80, align: 'center' });
+
+        return tableY + 25; // return the starting Y for rows
+    };
+
+    let currentY = drawPageHeader();
     let grandTotalQty = 0;
     let grandTotalAmt = 0;
 
     items.forEach((item, idx) => {
+        // Pagination check (if row goes beyond bottom margin 780)
+        if (currentY + 22 > 780) {
+            doc.addPage();
+            currentY = drawPageHeader();
+        }
+
         const poQty = item.calculation.orderQuantity || 1;
         const unitRate = item.calculation.unitFinalAmount || item.calculation.finalAmount;
         const totalAmt = poQty * unitRate;
@@ -233,6 +243,12 @@ async function generateMultiPdf(items, companyName) {
     });
 
     // 6. Totals Row
+    // Check if totals row fits on page, else paginate
+    if (currentY + 30 > 780) {
+        doc.addPage();
+        currentY = drawPageHeader();
+    }
+
     doc.rect(40, currentY, 515, 30).fill('#FFE699');
     doc.strokeColor('#000000').lineWidth(1).rect(40, currentY, 515, 30).stroke();
     
