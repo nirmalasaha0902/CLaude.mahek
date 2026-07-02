@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchReportsBtn = document.getElementById('searchReportsBtn');
     const refreshReportsBtn = document.getElementById('refreshReportsBtn');
     const statFilesProduced = document.getElementById('statFilesProduced');
-    const statTotalValue = document.getElementById('statTotalValue');
     const reportsTableBody = document.getElementById('reportsTableBody');
     const reportsTableLoading = document.getElementById('reportsTableLoading');
     let allQuotations = [];
+    let weeklyChartInstance = null;
 
     // Auth Check
     const checkAuth = () => {
@@ -280,13 +280,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 3. Update Stats
-        const totalFiles = filteredSessions.reduce((sum, s) => sum + s.quantity, 0);
-        const totalVal = filteredSessions.reduce((sum, s) => sum + s.costing, 0);
+        statFilesProduced.textContent = filteredSessions.length;
         
-        statFilesProduced.textContent = totalFiles;
-        statTotalValue.textContent = '₹' + totalVal.toFixed(2);
+        // 4. Render Chart
+        const ctx = document.getElementById('weeklyChart');
+        if (ctx) {
+            const labels = [];
+            const data = [];
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                labels.push(d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }));
+                
+                let dayCount = 0;
+                filteredSessions.forEach(s => {
+                    const sd = new Date(s.createdAt);
+                    sd.setHours(0,0,0,0);
+                    if (sd.getTime() === d.getTime()) {
+                        dayCount += s.quantity; 
+                    }
+                });
+                data.push(dayCount);
+            }
+            
+            if (weeklyChartInstance) {
+                weeklyChartInstance.destroy();
+            }
+            
+            weeklyChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Files Scanned',
+                        data: data,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
 
-        // 4. Render Table
+        // 5. Render Table
         if (filteredSessions.length === 0) {
             reportsTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No reports found for this search.</td></tr>`;
         } else {
